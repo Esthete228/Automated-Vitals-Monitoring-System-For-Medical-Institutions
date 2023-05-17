@@ -7,15 +7,32 @@
 <body>
 <h1>Vital Signs Monitoring System</h1>
 <p>Welcome to the Vital Signs Monitoring System!</p>
-<div>
-<a href="/patients">
-  <button>Create New Patient</button>
-</a>
+
+<div id="adminButtons" style="display: none;">
+  <a href="/patients">
+    <button>Create New Patient</button>
+  </a>
 </div>
-<div>
+
+<div id="doctorButtons" style="display: none;">
   <a href="/patientSelect">
     <button>Monitor Patients</button>
   </a>
 </div>
+
+<script>
+  // Retrieve the user's position from the server-side
+  fetch('/position')
+          .then(response => response.json())
+          .then(data => {
+            // Show the corresponding buttons based on the user's position
+            if (data.position === 'admin') {
+              document.getElementById('adminButtons').style.display = 'block';
+            } else if (data.position === 'doctor') {
+              document.getElementById('doctorButtons').style.display = 'block';
+            }
+          })
+          .catch(error => console.error('Error:', error));
+</script>
 </body>
 </html>
