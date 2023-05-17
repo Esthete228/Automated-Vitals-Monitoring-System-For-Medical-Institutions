@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Monitor Patient</title>
+</head>
+<body>
+<h1>Select Patient for monitoring</h1>
+<label for=patientSelect>Select Patient:</label>
+<select id="patientSelect">
+  <option value="">Select a patient</option>
+</select>
+<br><br>
+<button id="startMonitoringBtn">Start Monitoring</button>
+<br><br>
+<a href="/home">
+  <button> go back to home page</button>
+</a>
+<script>
+  const select = document.getElementById("patientSelect");
+  const startMonitoringBtn = document.getElementById("startMonitoringBtn");
+
+  // Event listener for the StartMonitoring button
+  startMonitoringBtn.addEventListener("click", () => {
+    const selectedPatientId = select.value;
+    if (selectedPatientId) {
+      redirectToMonitor(selectedPatientId);
+    } else {
+      alert("Please select a patient.");
+    }
+  });
+
+  // Fetch the list of patients and populate the dropdown
+  fetch('/fetchPatients')
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(patient => {
+              const option = document.createElement("option");
+              option.value = patient.id;
+              option.text = `${patient.firstName} ${patient.lastName}`;
+              select.appendChild(option);
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching patients:', error);
+          });
+
+  function redirectToMonitor(patientId) {
+    window.location.href = `/monitorPatient?id=${patientId}`;
+  }
+</script>
+</body>
+</html>

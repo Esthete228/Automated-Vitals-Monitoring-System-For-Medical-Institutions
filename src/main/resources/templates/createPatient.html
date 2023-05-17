@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Patient</title>
+</head>
+<body>
+<h1>Create Patient</h1>
+<form action="/patients" method="post">
+  <div>
+    <label for=firstName>First Name:</label>
+    <input type="text" id="firstName" name="firstName" required>
+  </div>
+  <div>
+    <label for=lastName>Last Name:</label>
+    <input type="text" id="lastName" name="lastName" required>
+  </div>
+  <div>
+    <label for=age>Age:</label>
+    <input type="number" id="age" name="age" required>
+  </div>
+  <div>
+    <label for=gender>Gender:</label>
+    <select id="gender" name="gender" required>
+      <option value="">--Please select an option--</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
+  <div>
+    <button type="submit">Create</button>
+  </div>
+</form>
+<div>
+  <a href="/home">
+    <button>go back to starter page</button>
+  </a>
+</div>
+</body>
+</html>
