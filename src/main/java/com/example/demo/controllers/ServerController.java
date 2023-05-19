@@ -96,11 +96,6 @@ public class ServerController {
         }
     }
 
-    @GetMapping("/patientSelect")
-    public String patientSelect() {
-        return "patientSelect";
-    }
-
     @GetMapping("/fetchPatients")
     @ResponseBody
     public List<Patient> fetchPatients() {

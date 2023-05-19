@@ -2,66 +2,217 @@
 <html lang="">
 <head>
   <meta charset="utf-8">
-  <title>Monitor Patient</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="/UpdatePatientData.js"></script>
-  <link rel="stylesheet" href="../static/style.css">
+  <title>Monitor Patients</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
 <div class="top-bar">
-
   <div class="bar-theme top-bar-large">
     <a href="/home" class="bar-item theme-l1">
       <button class="button theme">Go Back to Starter Page</button>
     </a>
+    <a href="/monitorPatient" class="bar-item theme-l2">
+      <button class="button theme">Select another Patient</button>
+    </a>
   </div>
-
 </div>
 
-<h1>Monitor Patient</h1>
+<h1>Monitor Patients</h1>
+
+<div id="patientSelectContainer">
+  <label for=patientSelect>Select Patients:</label>
+  <select id="patientSelect" multiple size="5">
+    <option value="">Select patients to monitor</option>
+  </select>
+  <br><br>
+  <button id="startMonitoringBtn">Start Monitoring</button>
+  <br><br>
+</div>
 
 <div id="vital-data">
-
   <h2>Vital Data</h2>
 
   <table>
     <thead>
     <tr>
+      <th>Patient ID</th>
       <th>Parameter</th>
-      <th></th>
       <th>Value</th>
+      <th>Status</th>
     </tr>
     </thead>
-    <tbody>
-    <tr>
-      <td>Heart Rate</td>
-      <td></td>
-      <td id="heart_rate"></td>
-    </tr>
-    <tr>
-      <td>Systolic Blood Pressure</td>
-      <td></td>
-      <td id="systolic_bp"></td>
-    </tr>
-    <tr>
-      <td>Diastolic Blood Pressure</td>
-      <td></td>
-      <td id="diastolic_bp"></td>
-    </tr>
-    <tr>
-      <td>Temperature</td>
-      <td></td>
-      <td id="temperature"></td>
-    </tr>
-    <tr>
-      <td>Oxygen Saturation</td>
-      <td></td>
-      <td id="oxygen_saturation"></td>
-    </tr>
-    </tbody>
+    <tbody id="vitalTableBody"></tbody>
   </table>
-
 </div>
+
+<script>
+  const patientSelectContainer = document.getElementById("patientSelectContainer");
+  const select = document.getElementById("patientSelect");
+  const startMonitoringBtn = document.getElementById("startMonitoringBtn");
+  const vitalTableBody = document.getElementById("vitalTableBody");
+  const selectedPatients = [];
+
+  // Event listener for the Start Monitoring button
+  startMonitoringBtn.addEventListener("click", () => {
+    const selectedPatientIds = Array.from(select.selectedOptions).map(option => option.value);
+    if (selectedPatientIds.length > 0) {
+      selectedPatients.push(...selectedPatientIds);
+      select.disabled = true;
+      startMonitoringBtn.disabled = true;
+      patientSelectContainer.style.display = "none";
+      selectedPatients.forEach(patientId => startDataRefresh(patientId));
+    } else {
+      alert("Please select at least one patient.");
+    }
+  });
+
+  // Fetch the list of patients and populate the dropdown
+  fetch('/fetchPatients')
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(patient => {
+              const option = document.createElement("option");
+              option.value = patient.id;
+              option.text = `${patient.firstName} ${patient.lastName}`;
+              select.appendChild(option);
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching patients:', error);
+          });
+
+  function createVitalRow(patientId) {
+    const row = document.createElement("tr");
+    row.id = `vitalRow_${patientId}`;
+    row.innerHTML = `
+      <td>${patientId}</td>
+      <td id="heart_rate_parameter_${patientId}">Heart Rate</td>
+      <td id="heart_rate_${patientId}"></td>
+      <td id="heart_rate_status_${patientId}"></td>
+    `;
+    vitalTableBody.appendChild(row);
+
+    const parameterRow = document.createElement("tr");
+    parameterRow.innerHTML = `
+      <td></td>
+      <td id="systolic_bp_parameter_${patientId}">Systolic Blood Pressure</td>
+      <td id="systolic_bp_${patientId}"></td>
+      <td id="systolic_bp_status_${patientId}"></td>
+    `;
+    vitalTableBody.appendChild(parameterRow);
+
+    const valueRow = document.createElement("tr");
+    valueRow.innerHTML = `
+      <td></td>
+      <td id="diastolic_bp_parameter_${patientId}">Diastolic Blood Pressure</td>
+      <td id="diastolic_bp_${patientId}"></td>
+      <td id="diastolic_bp_status_${patientId}"></td>
+    `;
+    vitalTableBody.appendChild(valueRow);
+
+    const statusRow = document.createElement("tr");
+    statusRow.innerHTML = `
+      <td></td>
+      <td id="temperature_parameter_${patientId}">Temperature</td>
+      <td id="temperature_${patientId}"></td>
+      <td id="temperature_status_${patientId}"></td>
+    `;
+    vitalTableBody.appendChild(statusRow);
+
+    const oxygenSaturationParameterRow = document.createElement("tr");
+    oxygenSaturationParameterRow.innerHTML = `
+      <td></td>
+      <td id="oxygen_saturation_parameter_${patientId}">Oxygen Saturation</td>
+      <td id="oxygen_saturation_${patientId}"></td>
+      <td id="oxygen_saturation_status_${patientId}"></td>
+    `;
+    vitalTableBody.appendChild(oxygenSaturationParameterRow);
+  }
+
+  function updateVitalsData(patientId, vitals) {
+    document.getElementById(`heart_rate_${patientId}`).innerText = vitals.heart_rate;
+    document.getElementById(`systolic_bp_${patientId}`).innerText = vitals.systolicBP;
+    document.getElementById(`diastolic_bp_${patientId}`).innerText = vitals.diastolicBP;
+    document.getElementById(`temperature_${patientId}`).innerText = vitals.temperature;
+    document.getElementById(`oxygen_saturation_${patientId}`).innerText = vitals.oxygen_saturation;
+
+    // Check vitals and update the status
+    checkVitals(patientId, vitals);
+  }
+
+  function checkVitals(patientId, vitals) {
+    // Check heart rate
+    if (vitals.heart_rate > 100 || vitals.heart_rate < 60) {
+      alert(`Patient ${patientId}: Heart rate is out of normal range!`);
+      displayStatus(patientId, 'heart_rate', 'Vital signs are not in normal range.');
+    } else {
+      displayStatus(patientId, 'heart_rate', 'Normal.');
+    }
+
+    // Check systolic blood pressure
+    if (vitals.systolicBP > 140 || vitals.systolicBP < 80) {
+      alert(`Patient ${patientId}: Systolic blood pressure is out of normal range!`);
+      displayStatus(patientId, 'systolic_bp', 'Vital signs are not in normal range.');
+    } else {
+      displayStatus(patientId, 'systolic_bp', 'Normal.');
+    }
+
+    // Check diastolic blood pressure
+    if (vitals.diastolicBP > 100 || vitals.diastolicBP < 40) {
+      alert(`Patient ${patientId}: Diastolic blood pressure is out of normal range!`);
+      displayStatus(patientId, 'diastolic_bp', 'Vital signs are not in normal range.');
+    } else {
+      displayStatus(patientId, 'diastolic_bp', 'Normal.');
+    }
+
+    // Check temperature
+    if (vitals.temperature > 41.2 || vitals.temperature < 30.0) {
+      alert(`Patient ${patientId}: Temperature is out of normal range!`);
+      displayStatus(patientId, 'temperature', 'Vital signs are not in normal range.');
+    } else {
+      displayStatus(patientId, 'temperature', 'Normal.');
+    }
+
+    // Check oxygen saturation
+    if (vitals.oxygen_saturation < 50) {
+      alert(`Patient ${patientId}: Oxygen saturation is below normal range!`);
+      displayStatus(patientId, 'oxygen_saturation', 'Vital signs are not in normal range.');
+    } else {
+      displayStatus(patientId, 'oxygen_saturation', 'Normal.');
+    }
+  }
+
+  function displayStatus(patientId, parameterId, statusMessage) {
+    document.getElementById(`${parameterId}_status_${patientId}`).innerText = statusMessage;
+  }
+
+
+  function startDataRefresh(patientId) {
+    createVitalRow(patientId);
+
+    // Fetch the initial vitals data and update the UI
+    fetch(`/monitorPatient/${patientId}/vitals`)
+            .then(response => response.json())
+            .then(vitals => {
+              updateVitalsData(patientId, vitals);
+            })
+            .catch(error => {
+              console.error(`Error fetching vitals data for patient ${patientId}:`, error);
+            });
+
+    // Set up periodic data refresh every 5 seconds
+    setInterval(() => {
+      fetch(`/monitorPatient/${patientId}/vitals`)
+              .then(response => response.json())
+              .then(vitals => {
+                updateVitalsData(patientId, vitals);
+              })
+              .catch(error => {
+                console.error(`Error fetching vitals data for patient ${patientId}:`, error);
+              });
+    }, 5000); // 5000 milliseconds = 5 seconds
+  }
+</script>
 </body>
 </html>
