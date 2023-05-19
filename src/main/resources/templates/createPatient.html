@@ -2,22 +2,38 @@
 <html>
 <head>
   <title>Create Patient</title>
+  <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
+
+
+<div class="top-bar">
+  <div class="bar-theme top-bar top-bar-large">
+    <a href="/home" class="bar-item theme-l1">
+      <button class="button theme">Go Back to Starter Page</button>
+    </a>
+  </div>
+</div>
+
 <h1>Create Patient</h1>
+
 <form action="/patients" method="post">
+
   <div>
     <label for=firstName>First Name:</label>
     <input type="text" id="firstName" name="firstName" required>
   </div>
+
   <div>
     <label for=lastName>Last Name:</label>
     <input type="text" id="lastName" name="lastName" required>
   </div>
+
   <div>
     <label for=age>Age:</label>
     <input type="number" id="age" name="age" required>
   </div>
+
   <div>
     <label for=gender>Gender:</label>
     <select id="gender" name="gender" required>
@@ -27,14 +43,11 @@
       <option value="Other">Other</option>
     </select>
   </div>
+
   <div>
     <button type="submit">Create</button>
   </div>
+
 </form>
-<div>
-  <a href="/home">
-    <button>go back to starter page</button>
-  </a>
-</div>
 </body>
 </html>

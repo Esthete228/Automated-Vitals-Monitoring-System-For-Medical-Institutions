@@ -1,26 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
   <title>Vital Signs Monitoring System</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-<h1>Vital Signs Monitoring System</h1>
-<p>Welcome to the Vital Signs Monitoring System!</p>
 
-<div id="adminButtons" style="display: none;">
-  <a href="/patients">
-    <button id="createPatientButton">Create New Patient</button>
-  </a>
+<div class="top-bar">
+
+  <div class="bar-theme top-bar top-bar-large">
+    <a href="/logout" class="bar-item theme-l1">
+      <button class="button theme">Logout</button>
+    </a>
+
+    <div id="adminButtons" style="display: none;">
+      <a href="/patients" class="bar-item theme-l2">
+        <button id="createPatientButton" class="button theme">Create New Patient</button>
+      </a>
+    </div>
+
+    <div id="doctorButtons" style="display: none;">
+      <a href="/patientSelect" class="bar-item theme-l3">
+        <button id="monitorPatientsButton" class="button theme">Monitor Patients</button>
+      </a>
+    </div>
+
+  </div>
+
 </div>
 
-<div id="doctorButtons" style="display: none;">
-  <a href="/patientSelect">
-    <button id="monitorPatientsButton">Monitor Patients</button>
-  </a>
+
+<div class="content">
+  <div class="container">
+    <h1>Vital Signs Monitoring System</h1>
+    <p>Welcome to the Vital Signs Monitoring System!</p>
+  </div>
 </div>
 
 <script>
+
   fetch('/position')
           .then(response => response.json())
           .then(data => {
@@ -29,6 +49,7 @@
 
             if (userPosition === 'admin') {
               document.getElementById('adminButtons').style.display = 'block';
+              document.getElementById('doctorButtons').style.display = 'block';
             }
 
             if (userPosition === 'doctor') {
@@ -36,6 +57,7 @@
             }
           })
           .catch(error => console.error('Error:', error));
+
 </script>
 </body>
 </html>

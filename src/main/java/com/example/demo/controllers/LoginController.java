@@ -90,4 +90,14 @@ public class LoginController {
         }
         return null;
     }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            // Invalidate the session to logout the user
+            session.invalidate();
+        }
+        return "redirect:/login";
+    }
 }

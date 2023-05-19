@@ -2,24 +2,35 @@
 <html>
 <head>
   <title>Monitor Patient</title>
+  <link rel="stylesheet" href="../static/style.css">
 </head>
 <body>
-<h1>Select Patient for monitoring</h1>
+
+
+<div class="top-bar">
+  <div class="bar-theme top-bar top-bar-large">
+    <a href="/home" class="bar-item theme-l1">
+      <button class="button theme">Go Back to Starter Page</button>
+    </a>
+  </div>
+</div>
+
+<h1>Select Patient for Monitoring</h1>
+
 <label for=patientSelect>Select Patient:</label>
 <select id="patientSelect">
   <option value="">Select a patient</option>
 </select>
+
 <br><br>
 <button id="startMonitoringBtn">Start Monitoring</button>
 <br><br>
-<a href="/home">
-  <button> go back to home page</button>
-</a>
+
 <script>
   const select = document.getElementById("patientSelect");
   const startMonitoringBtn = document.getElementById("startMonitoringBtn");
 
-  // Event listener for the StartMonitoring button
+  // Event listener for the Start Monitoring button
   startMonitoringBtn.addEventListener("click", () => {
     const selectedPatientId = select.value;
     if (selectedPatientId) {

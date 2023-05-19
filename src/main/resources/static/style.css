@@ -1,0 +1,160 @@
+body {
+    background-color: #f1f1f1;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-top: 50px;
+}
+
+h2 {
+    color: #333;
+    margin-bottom: 10px;
+    margin-left: 20px;
+}
+
+/* Top bar styles */
+.top-bar {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.top-bar .bar-theme {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.top-bar .bar-item {
+    color: #fff;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.top-bar .bar-item:hover {
+    text-decoration: underline;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+td:first-child {
+    font-weight: bold;
+}
+
+td:last-child {
+    text-align: center;
+}
+
+/* Content styles */
+.content {
+    padding: 20px;
+}
+
+.container {
+    margin-top: 50px;
+}
+
+.container h1 {
+    font-size: 36px;
+    color: #333;
+}
+
+.container p {
+    color: #555;
+}
+
+form {
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+button {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    cursor: pointer;
+    color: #fff;
+    background-color: #333;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+a {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+}
+
+a button {
+    background-color: #ccc;
+    color: #333;
+}
+
+a button:hover {
+    background-color: #ddd;
+}
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    cursor: pointer;
+    color: #fff;
+}
+
+.button.theme {
+    background-color: #333;
+}
+
+.button.theme:hover {
+    background-color: #555;
+}
