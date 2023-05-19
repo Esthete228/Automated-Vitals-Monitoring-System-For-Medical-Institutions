@@ -1,6 +1,7 @@
 package com.example.demo.entities;
 
 import com.example.demo.repositories.HealthStateRepository;
+import com.example.demo.repositories.PatientHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,12 +10,14 @@ import java.util.*;
 @Service
 public class VitalsGenerator {
     private final HealthStateRepository healthStateRepository;
+    private final PatientHistoryRepository patientHistoryRepository;
     private final Map<Integer, Timer> timers;
 
     @Autowired
     public VitalsGenerator(
-            HealthStateRepository healthStateRepository) {
+            HealthStateRepository healthStateRepository, PatientHistoryRepository patientHistoryRepository) {
         this.healthStateRepository = healthStateRepository;
+        this.patientHistoryRepository = patientHistoryRepository;
         this.timers = new HashMap<>();
     }
 
@@ -69,12 +72,29 @@ public class VitalsGenerator {
         double temperature = random.nextDouble() * (variabilityRange * 2) + (middleTemperature - variabilityRange);
         int oxygenSaturation = random.nextInt(variabilityRange * 2 + 1) + (middleOxygenSaturation - variabilityRange);
 
+        // Update the health state values
         healthState.setHeart_rate(heartRate);
         healthState.setSystolicBP(systolicBP);
         healthState.setDiastolicBP(diastolicBP);
         healthState.setTemperature(temperature);
         healthState.setOxygen_saturation(oxygenSaturation);
 
+        // Save the updated health state to the database
         healthStateRepository.save(healthState);
+
+
+
+        // Create a new patient history entry
+        PatientHistory patientHistoryEntry = new PatientHistory();
+        patientHistoryEntry.setPatient(healthState.getPatient());
+        patientHistoryEntry.setHeart_rate(heartRate);
+        patientHistoryEntry.setSystolicBP(systolicBP);
+        patientHistoryEntry.setDiastolicBP(diastolicBP);
+        patientHistoryEntry.setTemperature(temperature);
+        patientHistoryEntry.setOxygen_Saturation(oxygenSaturation);
+        patientHistoryEntry.setTimestamp(new Date());
+
+        // Save the patient history entry to the database
+        patientHistoryRepository.save(patientHistoryEntry);
     }
 }
