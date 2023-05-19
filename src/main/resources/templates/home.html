@@ -10,25 +10,28 @@
 
 <div id="adminButtons" style="display: none;">
   <a href="/patients">
-    <button>Create New Patient</button>
+    <button id="createPatientButton">Create New Patient</button>
   </a>
 </div>
 
 <div id="doctorButtons" style="display: none;">
   <a href="/patientSelect">
-    <button>Monitor Patients</button>
+    <button id="monitorPatientsButton">Monitor Patients</button>
   </a>
 </div>
 
 <script>
-  // Retrieve the user's position from the server-side
   fetch('/position')
           .then(response => response.json())
           .then(data => {
-            // Show the corresponding buttons based on the user's position
-            if (data.position === 'admin') {
+            const userPosition = data.position;
+            console.log(data); // Check the response data in the console
+
+            if (userPosition === 'admin') {
               document.getElementById('adminButtons').style.display = 'block';
-            } else if (data.position === 'doctor') {
+            }
+
+            if (userPosition === 'doctor') {
               document.getElementById('doctorButtons').style.display = 'block';
             }
           })

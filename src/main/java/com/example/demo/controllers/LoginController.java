@@ -2,14 +2,21 @@ package com.example.demo.controllers;
 
 import com.example.demo.entities.User;
 import com.example.demo.repositories.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.constraints.NotEmpty;
 
 @Controller
+@Validated
 public class LoginController {
     private final UserRepository userRepository;
 
@@ -24,13 +31,22 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password, Model model) {
+    public String login(
+            @NotEmpty @RequestParam String username,
+            @NotEmpty @RequestParam String password,
+            HttpServletRequest request,
+            Model model
+    ) {
         // Find the user by username
         User user = userRepository.findByUsername(username);
 
         // Check if the user exists and the password is correct
         if (user != null && user.getPassword().equals(password)) {
-            // User authenticated successfully, redirect to the home page or any other page
+            // User authenticated successfully, store the username in the session
+            HttpSession session = request.getSession();
+            session.setAttribute("username", username);
+
+            // Redirect to the home page or any other page
             return "redirect:/home";
         } else {
             // Invalid username or password, add an error message to the model
@@ -39,36 +55,39 @@ public class LoginController {
         }
     }
 
-    @GetMapping
-    public PositionResponse getPosition() {
-        // Retrieve the user's position from your authentication or session management logic
-        String userPosition = getCurrentUserPosition();
+    @GetMapping(value = "/position")
+    @ResponseBody
+    public PositionResponse getPosition(HttpServletRequest request) {
+        // Retrieve the currently authenticated username from the session
+        String authenticatedUsername = getAuthenticatedUsername(request);
 
-        // Create a response object with the user's position
-        PositionResponse response = new PositionResponse(userPosition);
+        // Add a debug log to check the authenticated username
+        System.out.println("Authenticated Username: " + authenticatedUsername);
 
-        return response;
-    }
+        // Retrieve the user from the repository or database based on the username
+        User authenticatedUser = userRepository.findByUsername(authenticatedUsername);
 
-    private String getCurrentUserPosition() {
-        // Implement your logic to retrieve the user's position here
-        // This could involve checking the user's role or any other mechanism you use for user authorization
-        // Return the user's position as a string (e.g., "admin", "doctor", etc.)
-        return "supreme";
-    }
+        // Add debug logs to check the value of the authenticated user and the position field
+        System.out.println("Retrieved User: " + authenticatedUser);
+        if (authenticatedUser != null) {
+            String userPosition = authenticatedUser.getPosition();
+            System.out.println("User Position: " + userPosition);
 
-    // Response object to represent the user's position
-    private static class PositionResponse {
-        private String position;
-
-        public PositionResponse(String position) {
-            this.position = position;
+            if ("admin".equalsIgnoreCase(userPosition)) {
+                return new PositionResponse("admin");
+            } else if ("doctor".equalsIgnoreCase(userPosition)) {
+                return new PositionResponse("doctor");
+            }
         }
 
-        // Getter for position
+        return new PositionResponse("unknown"); // Return a default position if the user's position is not recognized
+    }
 
-        public String getPosition() {
-            return position;
+    private String getAuthenticatedUsername(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            return (String) session.getAttribute("username");
         }
+        return null;
     }
 }

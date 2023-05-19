@@ -1,6 +1,5 @@
 package com.example.demo.entities;
 import jakarta.persistence.*;
-
 @Entity
 @Table(name = "patient")
 public class Patient {
