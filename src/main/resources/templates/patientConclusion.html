@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patient Conclusion</title>
+    <link rel="stylesheet" href="/style.css">
+<style>
+    select,
+    textarea {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+    }
+
+    #saveConclusionBtn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+</head>
+<body>
+<div class="top-bar">
+    <div class="bar-theme top-bar-large">
+        <a href="/home" class="bar-item theme-l1">
+            <button class="button theme">Go Back to Starter Page</button>
+        </a>
+    </div>
+</div>
+
+<h1>Medical Conclusions</h1>
+
+<div id="patientSelectContainer">
+    <label for=patientSelect>Select Patients:</label>
+    <select id="patientSelect" multiple size="5">
+    </select>
+</div>
+<br><br>
+<textarea id="conclusionTextArea" rows="4" cols="50"></textarea>
+<br><br>
+<button id="saveConclusionBtn">Save Conclusion</button>
+
+<script>
+    const select = document.getElementById("patientSelect");
+    const conclusionTextArea = document.getElementById("conclusionTextArea");
+    const saveConclusionBtn = document.getElementById("saveConclusionBtn");
+
+    // Function to fetch and display the existing conclusion for a patient
+    function fetchConclusion(patientId) {
+        fetch(`/getConclusion/${patientId}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error("Error retrieving conclusion.");
+                }
+            })
+            .then(conclusion => {
+                conclusionTextArea.value = conclusion;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Function to fetch patients and populate the select dropdown
+    function fetchPatients() {
+        fetch('/fetchPatients')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(patient => {
+                    const option = document.createElement("option");
+                    option.value = patient.id;
+                    option.text = `${patient.firstName} ${patient.lastName}`;
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching patients:', error);
+            });
+    }
+
+    // Event listener for patient select change
+    select.addEventListener("change", () => {
+        const selectedPatientId = select.value;
+        if (selectedPatientId) {
+            clearConclusion(); // Reset the conclusion text area
+            fetchConclusion(selectedPatientId);
+        } else {
+            clearConclusion();
+        }
+    });
+
+    // Event listener for save conclusion button click
+    saveConclusionBtn.addEventListener("click", () => {
+        const selectedPatientId = select.value;
+        if (selectedPatientId) {
+            const conclusion = conclusionTextArea.value;
+            saveConclusion(selectedPatientId, conclusion);
+        } else {
+            alert("Please select a patient.");
+        }
+    });
+
+    // Function to save the conclusion for a patient
+    function saveConclusion(patientId, conclusion) {
+        fetch(`/saveConclusion/${patientId}`, {
+            method: 'POST',
+            body: JSON.stringify({ conclusion }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Conclusion saved successfully!");
+                } else {
+                    alert("Error saving conclusion.");
+                }
+            })
+            .catch(error => {
+                console.error('Error saving conclusion:', error);
+            });
+    }
+
+    // Function to clear the conclusion textarea
+    function clearConclusion() {
+        conclusionTextArea.value = "";
+    }
+
+    // Fetch patients and populate the select dropdown
+    fetchPatients();
+</script>
+</body>
+</html>

@@ -75,9 +75,11 @@ public class LoginController {
 
             if ("admin".equalsIgnoreCase(userPosition)) {
                 return new PositionResponse("admin");
+            } else if ("senior".equalsIgnoreCase(userPosition)) {
+                return new PositionResponse("senior");
             } else if ("doctor".equalsIgnoreCase(userPosition)) {
                 return new PositionResponse("doctor");
-            }
+        }
         }
         // Повернути position за замовчуванням, якщо позицію користувача не розпізнано
         return new PositionResponse("unknown");
