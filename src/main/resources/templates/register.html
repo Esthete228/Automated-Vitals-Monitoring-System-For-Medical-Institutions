@@ -34,7 +34,7 @@
 
 <script>
   function registerUser(event) {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault(); // Заборона надсилання форми
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
@@ -46,7 +46,7 @@
       position: position
     };
 
-    // Make a POST request to the backend server to register the user
+    // Виконання POST-запиту до бекенд-сервера для реєстрації користувача
     fetch('/register', {
       method: 'POST',
       headers: {
@@ -56,10 +56,10 @@
     })
             .then(response => response.json())
             .then(data => {
-              // Handle the response from the server
+              // Обробити відповідь від сервера
               console.log(data);
               alert("User registered successfully!");
-              document.getElementById("registerForm").reset(); // Reset the form
+              document.getElementById("registerForm").reset(); // Скинути форму
             })
             .catch(error => {
               console.error('Error:', error);

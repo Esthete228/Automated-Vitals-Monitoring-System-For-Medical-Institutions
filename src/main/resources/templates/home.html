@@ -51,7 +51,7 @@
           .then(response => response.json())
           .then(data => {
             const userPosition = data.position;
-            console.log(data); // Check the response data in the console
+            console.log(data); // Перевірка даних відповіді в консолі
 
             if (userPosition === 'admin') {
               document.getElementById('adminButtons').style.display = 'block';

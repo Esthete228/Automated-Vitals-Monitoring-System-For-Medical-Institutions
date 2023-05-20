@@ -53,7 +53,7 @@
   const vitalTableBody = document.getElementById("vitalTableBody");
   const selectedPatients = [];
 
-  // Event listener for the Start Monitoring button
+  // Приймач подій для кнопки "Почати моніторинг
   startMonitoringBtn.addEventListener("click", () => {
     const selectedPatientIds = Array.from(select.selectedOptions).map(option => option.value);
     if (selectedPatientIds.length > 0) {
@@ -67,7 +67,7 @@
     }
   });
 
-  // Fetch the list of patients and populate the dropdown
+  // Отримання списку пацієнтів і заповнення випадаючого списку
   fetch('/fetchPatients')
           .then(response => response.json())
           .then(data => {
@@ -137,12 +137,12 @@
     document.getElementById(`temperature_${patientId}`).innerText = vitals.temperature;
     document.getElementById(`oxygen_saturation_${patientId}`).innerText = vitals.oxygen_saturation;
 
-    // Check vitals and update the status
+    // Перевірка життєвих показників та оновлення статусу
     checkVitals(patientId, vitals);
   }
 
   function checkVitals(patientId, vitals) {
-    // Check heart rate
+    // Перевірка серцебиття
     if (vitals.heart_rate > 100 || vitals.heart_rate < 60) {
       alert(`Patient ${patientId}: Heart rate is out of normal range!`);
       displayStatus(patientId, 'heart_rate', 'Vital signs are not in normal range.');
@@ -150,7 +150,7 @@
       displayStatus(patientId, 'heart_rate', 'Normal.');
     }
 
-    // Check systolic blood pressure
+    // Перевірка систолічного артеріального тиску
     if (vitals.systolicBP > 140 || vitals.systolicBP < 80) {
       alert(`Patient ${patientId}: Systolic blood pressure is out of normal range!`);
       displayStatus(patientId, 'systolic_bp', 'Vital signs are not in normal range.');
@@ -158,7 +158,7 @@
       displayStatus(patientId, 'systolic_bp', 'Normal.');
     }
 
-    // Check diastolic blood pressure
+    // Перевірка діастолічного артеріального тиску
     if (vitals.diastolicBP > 100 || vitals.diastolicBP < 40) {
       alert(`Patient ${patientId}: Diastolic blood pressure is out of normal range!`);
       displayStatus(patientId, 'diastolic_bp', 'Vital signs are not in normal range.');
@@ -166,7 +166,7 @@
       displayStatus(patientId, 'diastolic_bp', 'Normal.');
     }
 
-    // Check temperature
+    // Перевірка температури
     if (vitals.temperature > 41.2 || vitals.temperature < 30.0) {
       alert(`Patient ${patientId}: Temperature is out of normal range!`);
       displayStatus(patientId, 'temperature', 'Vital signs are not in normal range.');
@@ -174,7 +174,7 @@
       displayStatus(patientId, 'temperature', 'Normal.');
     }
 
-    // Check oxygen saturation
+    // Перевірка насичення киснем
     if (vitals.oxygen_saturation < 50) {
       alert(`Patient ${patientId}: Oxygen saturation is below normal range!`);
       displayStatus(patientId, 'oxygen_saturation', 'Vital signs are not in normal range.');
@@ -191,7 +191,7 @@
   function startDataRefresh(patientId) {
     createVitalRow(patientId);
 
-    // Fetch the initial vitals data and update the UI
+    // Отримання початкових даних про життєві показники та оновити інтерфейс
     fetch(`/monitorPatient/${patientId}/vitals`)
             .then(response => response.json())
             .then(vitals => {
@@ -201,7 +201,7 @@
               console.error(`Error fetching vitals data for patient ${patientId}:`, error);
             });
 
-    // Set up periodic data refresh every 5 seconds
+    // Налаштування періодичного оновлення даних кожні 5 секунд
     setInterval(() => {
       fetch(`/monitorPatient/${patientId}/vitals`)
               .then(response => response.json())
@@ -211,7 +211,7 @@
               .catch(error => {
                 console.error(`Error fetching vitals data for patient ${patientId}:`, error);
               });
-    }, 5000); // 5000 milliseconds = 5 seconds
+    }, 5000);
   }
 </script>
 </body>

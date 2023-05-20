@@ -32,7 +32,7 @@
 </div>
 
 <script>
-  // Function to fetch patient data and populate the patientSelect dropdown
+  // Функція для отримання даних про пацієнта та заповнення випадаючого списку patientSelect
   fetch('/fetchPatients')
           .then(response => response.json())
           .then(data => {
@@ -47,17 +47,17 @@
             console.error('Error fetching patients:', error);
           });
 
-  // Function to fetch and display patient history based on the selected patient
+  // Функція для отримання та відображення історії пацієнта на основі обраного пацієнта
   function showPatientHistory() {
     const patientSelect = document.getElementById("patientSelect");
     const selectedPatientId = patientSelect.value;
     const patientHistoryContainer = document.getElementById("patientHistoryContainer");
 
-    // Clear existing patient history
+  // Очистити контейнер наявної історії хвороби
     patientHistoryContainer.innerHTML = '';
 
     if (selectedPatientId) {
-      // Fetch patient history based on the selected patient ID
+      // Отримання історії пацієнта на основі вибраного ідентифікатора пацієнта
       fetch(`/patient_history/${selectedPatientId}`)
               .then(response => response.json())
               .then(data => {
@@ -65,27 +65,27 @@
                   // Create an unordered list to display the patient history
                   const historyList = document.createElement("ul");
 
-                  // Add patient history items to the list
+                  // Створення невпорядкованого списку для відображення історії пацієнта
                   data.patientHistory.forEach(history => {
                     const historyItem = document.createElement("li");
 
-                    // Build the content of each history item using specific properties
+                    // Ствоення вмісту кожного елемента історії, використовуючи певні властивості
                     const content = `Heart Rate: ${history.heartRate}, Systolic BP: ${history.systolicBP}, Diastolic BP: ${history.diastolicBP}, Oxygen Saturation: ${history.oxygenSaturation}, Temperature: ${history.temperature}`;
 
                     historyItem.textContent = content;
                     historyList.appendChild(historyItem);
                   });
 
-                  // Append the history list to the patientHistoryContainer
+                  // Додання списку історій до контейнера patientHistoryContainer
                   patientHistoryContainer.appendChild(historyList);
                 } else {
-                  // No patient history available
+                  // Якщо історія хвороби відсутня
                   const noHistoryMessage = document.createElement("p");
                   noHistoryMessage.textContent = "No patient history available.";
                   patientHistoryContainer.appendChild(noHistoryMessage);
                 }
 
-                // Display the JSON response for debugging
+                // Відображення відповіді JSON для налагодження
                 console.log(JSON.stringify(data));
               })
               .catch(error => console.error('Error:', error));
