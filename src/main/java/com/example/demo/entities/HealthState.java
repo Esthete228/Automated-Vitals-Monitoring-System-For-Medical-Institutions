@@ -19,7 +19,7 @@ public class HealthState {
 
     @Column(name = "temperature") private double temperature;
 
-
+    // Геттери та сеттери
     public int getID() {
         return ID;
     }

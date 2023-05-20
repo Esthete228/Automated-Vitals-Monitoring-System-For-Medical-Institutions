@@ -14,6 +14,7 @@ public class User {
 
     @Column(name = "position") private String position;
 
+    // Геттери та сеттери
     public int getID() {
         return ID;
     }

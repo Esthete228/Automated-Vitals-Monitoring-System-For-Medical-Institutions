@@ -23,6 +23,8 @@ public class PatientHistory {
 
     @Column(name = "Timestamp") private java.util.Date Timestamp;
 
+
+    // Геттери та сеттери
     public int getID() {
         return ID;
     }

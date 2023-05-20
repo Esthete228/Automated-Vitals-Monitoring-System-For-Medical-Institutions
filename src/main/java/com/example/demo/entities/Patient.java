@@ -14,7 +14,7 @@ public class Patient {
 
     @Column(name = "Gender") private String gender;
 
-    // Getters and setters
+    // Геттери та сеттери
     public int getID() {
         return ID;
     }

@@ -37,19 +37,19 @@ public class LoginController {
             HttpServletRequest request,
             Model model
     ) {
-        // Find the user by username
+        // Знаходимо користувача по змінній username
         User user = userRepository.findByUsername(username);
 
-        // Check if the user exists and the password is correct
+        // Перевіряємо чи користувач існує і чи був правильно введений пароль
         if (user != null && user.getPassword().equals(password)) {
-            // User authenticated successfully, store the username in the session
+            // Користувач успішно автентифікований, зберігаємо ім'я користувача в сесії
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
 
-            // Redirect to the home page or any other page
+            // Перенаправлення на домашню сторінку
             return "redirect:/home";
         } else {
-            // Invalid username or password, add an error message to the model
+            // Невірне ім'я користувача або пароль
             model.addAttribute("error", "Invalid username or password");
             return "login";
         }
@@ -58,16 +58,16 @@ public class LoginController {
     @GetMapping(value = "/position")
     @ResponseBody
     public PositionResponse getPosition(HttpServletRequest request) {
-        // Retrieve the currently authenticated username from the session
+        // Отримуємо поточне автентифіковане ім'я користувача з сеансу
         String authenticatedUsername = getAuthenticatedUsername(request);
 
-        // Add a debug log to check the authenticated username
+        // Вивід у консоль для перевірки автентифікованого імені користувача
         System.out.println("Authenticated Username: " + authenticatedUsername);
 
-        // Retrieve the user from the repository or database based on the username
+        // Отримуємо користувача зі сховища або бази даних на основі імені користувача
         User authenticatedUser = userRepository.findByUsername(authenticatedUsername);
 
-        // Add debug logs to check the value of the authenticated user and the position field
+        // Вивід у консоль для перевірки значення автентифікованого користувача та поля position
         System.out.println("Retrieved User: " + authenticatedUser);
         if (authenticatedUser != null) {
             String userPosition = authenticatedUser.getPosition();
@@ -79,8 +79,8 @@ public class LoginController {
                 return new PositionResponse("doctor");
             }
         }
-
-        return new PositionResponse("unknown"); // Return a default position if the user's position is not recognized
+        // Повернути position за замовчуванням, якщо позицію користувача не розпізнано
+        return new PositionResponse("unknown");
     }
 
     private String getAuthenticatedUsername(HttpServletRequest request) {
@@ -95,7 +95,7 @@ public class LoginController {
     public String logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
-            // Invalidate the session to logout the user
+            // Анулювати сесію для виходу користувача з системи
             session.invalidate();
         }
         return "redirect:/login";

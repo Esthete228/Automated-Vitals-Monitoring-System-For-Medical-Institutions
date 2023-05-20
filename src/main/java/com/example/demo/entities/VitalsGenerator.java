@@ -39,9 +39,9 @@ public class VitalsGenerator {
             };
 
             Timer timer = new Timer();
-            // Schedule the task to run every 5 seconds
+            // запланування запуску завдання кожні 5 секунд
             timer.scheduleAtFixedRate(
-                    task, 0, 5000); // Adjust the interval
+                    task, 0, 5000); // Налаштування інтервалу
 
             timers.put(healthState.getID(), timer);
         }
@@ -49,42 +49,42 @@ public class VitalsGenerator {
 
     private void generateAndSaveData(
             HealthState healthState) {
-        // Generate new data for the health state
-        // Update the health state with the generated data
-        // Save the updated health state to the database
+        // Генерація нових даних для стану здоров'я
+        // Оновлення стану здоров'я згенерованими даними
+        // Збереження оновленого стану здоров'я в базі даних
 
         Random random = new Random();
 
-// Middle values
+        // Середні значення
         int middleHeartRate = 80;
         int middleSystolicBP = 120;
         int middleDiastolicBP = 80;
         double middleTemperature = 37.0;
         int middleOxygenSaturation = 95;
 
-// Variability range
+        // Діапазон мінливості
         int variabilityRange = 5;
 
-// Generate values around the middle values with variability
+        // Генерація значення навколо середніх значень з мінливістю
         int heartRate = random.nextInt(variabilityRange * 2 + 1) + (middleHeartRate - variabilityRange);
         int systolicBP = random.nextInt(variabilityRange * 2 + 1) + (middleSystolicBP - variabilityRange);
         int diastolicBP = random.nextInt(variabilityRange * 2 + 1) + (middleDiastolicBP - variabilityRange);
         double temperature = random.nextDouble() * (variabilityRange * 2) + (middleTemperature - variabilityRange);
         int oxygenSaturation = random.nextInt(variabilityRange * 2 + 1) + (middleOxygenSaturation - variabilityRange);
 
-        // Update the health state values
+        // Оновлення значення стану здоров'я
         healthState.setHeart_rate(heartRate);
         healthState.setSystolicBP(systolicBP);
         healthState.setDiastolicBP(diastolicBP);
         healthState.setTemperature(temperature);
         healthState.setOxygen_saturation(oxygenSaturation);
 
-        // Save the updated health state to the database
+        // Збереження оновленого стану здоров'я в базі даних
         healthStateRepository.save(healthState);
 
 
 
-        // Create a new patient history entry
+        // Створрення нового запису в історії хвороби
         PatientHistory patientHistoryEntry = new PatientHistory();
         patientHistoryEntry.setPatient(healthState.getPatient());
         patientHistoryEntry.setHeart_rate(heartRate);
@@ -94,7 +94,7 @@ public class VitalsGenerator {
         patientHistoryEntry.setOxygen_Saturation(oxygenSaturation);
         patientHistoryEntry.setTimestamp(new Date());
 
-        // Save the patient history entry to the database
+        // Збереження історії хвороби пацієнта в базі даних
         patientHistoryRepository.save(patientHistoryEntry);
     }
 }

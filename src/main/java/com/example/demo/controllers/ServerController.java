@@ -51,28 +51,28 @@ public class ServerController {
     @PostMapping(value = "/patients", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String createPatient(@ModelAttribute @Validated Patient patient, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Validation errors occurred
-            return "error"; // Return the "error" view name
+            // Виникли помилки перевірки
+            return "error";
         }
 
         try {
-            // Save the patient
+            // Збереження пацієнта
             patientRepository.save(patient);
 
-            // Create a health state for the patient
+            // Створення стану здоров'я для пацієнта
             HealthState healthState = new HealthState();
             healthState.setPatient(patient);
             healthStateRepository.save(healthState);
-            // Start updating health state data
+            // Почати генерування даних про стан здоров'я
             vitalsGenerator.startGeneratingData(healthState);
 
-            return "/success"; // Return the "success" view name
+            return "/success";
         } catch (DataAccessException e) {
-            // Handle database-related exceptions
-            return "error"; // Return the "error" view name
+            // Обробка виключень, пов'язаних з базою даних
+            return "error";
         } catch (Exception e) {
-            // Handle other exceptions
-            return "error"; // Return the "error" view name
+            // Обробка інших виключень
+            return "error";
         }
     }
 
@@ -129,20 +129,20 @@ public class ServerController {
     @ResponseBody
     public ResponseEntity<String> registerUser(@RequestBody @Validated User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            // Validation errors occurred
+            // Виникли помилки валідації
             return ResponseEntity.badRequest().body("{\"message\": \"Validation error\"}");
         }
 
         try {
-            // Save the user to the database
+            // Зберегти користувача в базі даних
             userRepository.save(user);
 
             return ResponseEntity.ok("{\"message\": \"User registered successfully\"}");
         } catch (DataAccessException e) {
-            // Handle database-related exceptions
+            // Обробка виключень, пов'язаних з базою даних
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Database error\"}");
         } catch (Exception e) {
-            // Handle other exceptions
+            // Обробка інших виключень
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Unknown error\"}");
         }
     }
@@ -159,7 +159,7 @@ public class ServerController {
         Optional<Patient> optionalPatient = patientRepository.findById(patientId);
         if (optionalPatient.isPresent()) {
             Patient patient = optionalPatient.get();
-            // Retrieve the patient's history based on the patient ID
+            // Отримуємо історію пацієнта на основі ідентифікатора пацієнта
             List<PatientHistory> patientHistory = patientHistoryRepository.findByPatient(patient);
 
             response.put("patient", patient);
