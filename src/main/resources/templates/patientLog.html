@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="utf-8">
+  <title>Monitor Patients</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="bar-theme top-bar-large">
+    <a href="/home" class="bar-item theme-l1">
+      <button class="button theme">Go Back to Starter Page</button>
+    </a>
+    <a href="/monitorPatient" class="bar-item theme-l2">
+      <button class="button theme">Select another Patient</button>
+    </a>
+  </div>
+</div>
+
+<h1>Review Patient Log</h1>
+
+<div id="patientSelectContainer">
+  <label for=patientSelect>Select Patients:</label>
+  <select id="patientSelect" multiple size="5">
+    <option value="">Select patients log</option>
+  </select>
+  <br><br>
+  <button id="startReviewBtn" onclick="showPatientHistory()">Show patient history</button>
+  <br><br>
+  <div id="patientHistoryContainer"></div>
+</div>
+
+<script>
+  // Function to fetch patient data and populate the patientSelect dropdown
+  fetch('/fetchPatients')
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(patient => {
+              const option = document.createElement("option");
+              option.value = patient.id;
+              option.text = `${patient.firstName} ${patient.lastName}`;
+              patientSelect.appendChild(option);
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching patients:', error);
+          });
+
+  // Function to fetch and display patient history based on the selected patient
+  function showPatientHistory() {
+    const patientSelect = document.getElementById("patientSelect");
+    const selectedPatientId = patientSelect.value;
+    const patientHistoryContainer = document.getElementById("patientHistoryContainer");
+
+    // Clear existing patient history
+    patientHistoryContainer.innerHTML = '';
+
+    if (selectedPatientId) {
+      // Fetch patient history based on the selected patient ID
+      fetch(`/patient_history/${selectedPatientId}`)
+              .then(response => response.json())
+              .then(data => {
+                if (data && data.patientHistory && data.patientHistory.length > 0) {
+                  // Create an unordered list to display the patient history
+                  const historyList = document.createElement("ul");
+
+                  // Add patient history items to the list
+                  data.patientHistory.forEach(history => {
+                    const historyItem = document.createElement("li");
+
+                    // Build the content of each history item using specific properties
+                    const content = `Heart Rate: ${history.heartRate}, Systolic BP: ${history.systolicBP}, Diastolic BP: ${history.diastolicBP}, Oxygen Saturation: ${history.oxygenSaturation}, Temperature: ${history.temperature}`;
+
+                    historyItem.textContent = content;
+                    historyList.appendChild(historyItem);
+                  });
+
+                  // Append the history list to the patientHistoryContainer
+                  patientHistoryContainer.appendChild(historyList);
+                } else {
+                  // No patient history available
+                  const noHistoryMessage = document.createElement("p");
+                  noHistoryMessage.textContent = "No patient history available.";
+                  patientHistoryContainer.appendChild(noHistoryMessage);
+                }
+
+                // Display the JSON response for debugging
+                console.log(JSON.stringify(data));
+              })
+              .catch(error => console.error('Error:', error));
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,10 +1,8 @@
 package com.example.demo.controllers;
 
-import com.example.demo.entities.HealthState;
-import com.example.demo.entities.Patient;
-import com.example.demo.entities.User;
-import com.example.demo.entities.VitalsGenerator;
+import com.example.demo.entities.*;
 import com.example.demo.repositories.HealthStateRepository;
+import com.example.demo.repositories.PatientHistoryRepository;
 import com.example.demo.repositories.PatientRepository;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -29,14 +29,17 @@ public class ServerController {
 
     private final UserRepository userRepository;
 
+    private final PatientHistoryRepository patientHistoryRepository;
+
     @Autowired
     public ServerController(VitalsGenerator vitalsGenerator, PatientRepository patientRepository,
-                            HealthStateRepository healthStateRepository, UserRepository userRepository) {
+                            HealthStateRepository healthStateRepository, UserRepository userRepository, PatientHistoryRepository patientHistoryRepository) {
 
         this.patientRepository = patientRepository;
         this.healthStateRepository = healthStateRepository;
         this.vitalsGenerator = vitalsGenerator;
         this.userRepository = userRepository;
+        this.patientHistoryRepository = patientHistoryRepository;
     }
 
 
@@ -142,5 +145,29 @@ public class ServerController {
             // Handle other exceptions
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Unknown error\"}");
         }
+    }
+
+    @GetMapping("/patientLog")
+    public String patientLog() {
+        return "patientLog";
+    }
+
+    @GetMapping(value = "/patient_history/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public Map<String, Object> showPatientHistory(@PathVariable("id") int patientId) {
+        Map<String, Object> response = new HashMap<>();
+        Optional<Patient> optionalPatient = patientRepository.findById(patientId);
+        if (optionalPatient.isPresent()) {
+            Patient patient = optionalPatient.get();
+            // Retrieve the patient's history based on the patient ID
+            List<PatientHistory> patientHistory = patientHistoryRepository.findByPatient(patient);
+
+            response.put("patient", patient);
+            response.put("patientHistory", patientHistory);
+        } else {
+            response.put("patient", null);
+            response.put("patientHistory", null);
+        }
+        return response;
     }
 }
