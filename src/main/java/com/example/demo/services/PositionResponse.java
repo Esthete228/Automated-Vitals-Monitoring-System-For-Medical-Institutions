@@ -1,4 +1,4 @@
-package com.example.demo.controllers;
+package com.example.demo.services;
 
 public class PositionResponse {
     private final String position;
