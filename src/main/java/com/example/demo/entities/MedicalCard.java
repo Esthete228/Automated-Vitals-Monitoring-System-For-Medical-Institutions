@@ -16,7 +16,7 @@ public class MedicalCard {
     @JoinColumn(name = "patientID")
     private Patient patient;
 
-    // Гетери сетери і конструктори
+    // Constructors, getters, and setters
 
     public MedicalCard() {
     }
