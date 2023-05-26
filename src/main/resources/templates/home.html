@@ -19,22 +19,25 @@
       <a href="/register" class="bar-item theme-l2">
         <button id="createDoctorButton" class="button theme">Create New Doctor</button>
       </a>
+      <a href="/departments" class="bar-item theme-l3">
+        <button id="createDepartmentButton" class="button theme">Create New Department</button>
+      </a>
     </div>
 
     <div id="seniorDoctorButtons" style="display: none;">
-      <a href="/patients" class="bar-item theme-l3">
+      <a href="/patients" class="bar-item theme-l2">
         <button id="createPatientButton" class="button theme">Create New Patient</button>
       </a>
-      <a href="/patientLog" class="bar-item theme-l4">
+      <a href="/patientLog" class="bar-item theme-l3">
         <button id="reviewPatientHistory" class="button theme">Review patients health history</button>
       </a>
-      <a href="/patientConclusion" class="bar-item theme-l5">
+      <a href="/patientConclusion" class="bar-item theme-l4">
         <button id="reviewPatientConclusion" class="button theme">Review patients conclusion</button>
       </a>
     </div>
 
     <div id="doctorButtons" style="display: none;">
-      <a href="/monitorPatient" class="bar-item theme-l6">
+      <a href="/monitorPatient" class="bar-item theme-l2">
         <button id="monitorPatientsButton" class="button theme">Monitor Patients</button>
       </a>
     </div>
@@ -61,8 +64,6 @@
 
             if (userPosition === 'admin') {
               document.getElementById('adminButtons').style.display = 'block';
-              document.getElementById('seniorDoctorButtons').style.display = 'block';
-              document.getElementById('doctorButtons').style.display = 'block';
             }
 
             if (userPosition === 'senior') {

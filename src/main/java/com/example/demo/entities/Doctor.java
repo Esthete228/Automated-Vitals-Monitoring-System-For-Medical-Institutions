@@ -3,8 +3,8 @@ package com.example.demo.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "doctors")
+public class Doctor {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private int ID;
 
@@ -13,6 +13,10 @@ public class User {
     @Column(name = "password") private String password;
 
     @Column(name = "position") private String position;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
     // Геттери та сеттери
     public int getID() {
@@ -45,5 +49,13 @@ public class User {
 
     public void setPosition(String position) {
         this.position = position;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(Department department) {
+        this.department = department;
     }
 }

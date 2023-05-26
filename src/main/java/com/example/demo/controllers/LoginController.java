@@ -1,8 +1,8 @@
 package com.example.demo.controllers;
 
-import com.example.demo.entities.User;
-import com.example.demo.repositories.UserRepository;
-import com.example.demo.services.PositionResponse;
+import com.example.demo.entities.Doctor;
+import com.example.demo.repositories.DoctorRepository;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +19,11 @@ import javax.validation.constraints.NotEmpty;
 @Controller
 @Validated
 public class LoginController {
-    private final UserRepository userRepository;
+    private final DoctorRepository doctorRepository;
 
     @Autowired
-    public LoginController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public LoginController(DoctorRepository doctorRepository) {
+        this.doctorRepository = doctorRepository;
     }
 
     @GetMapping("/login")
@@ -39,10 +39,10 @@ public class LoginController {
             Model model
     ) {
         // Знаходимо користувача по змінній username
-        User user = userRepository.findByUsername(username);
+        Doctor doctor = doctorRepository.findByUsername(username);
 
         // Перевіряємо чи користувач існує і чи був правильно введений пароль
-        if (user != null && user.getPassword().equals(password)) {
+        if (doctor != null && doctor.getPassword().equals(password)) {
             // Користувач успішно автентифікований, зберігаємо ім'я користувача в сесії
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
@@ -66,13 +66,13 @@ public class LoginController {
         System.out.println("Authenticated Username: " + authenticatedUsername);
 
         // Отримуємо користувача зі сховища або бази даних на основі імені користувача
-        User authenticatedUser = userRepository.findByUsername(authenticatedUsername);
+        Doctor authenticatedDoctor = doctorRepository.findByUsername(authenticatedUsername);
 
         // Вивід у консоль для перевірки значення автентифікованого користувача та поля position
-        System.out.println("Retrieved User: " + authenticatedUser);
-        if (authenticatedUser != null) {
-            String userPosition = authenticatedUser.getPosition();
-            System.out.println("User Position: " + userPosition);
+        System.out.println("Retrieved Doctor: " + authenticatedDoctor);
+        if (authenticatedDoctor != null) {
+            String userPosition = authenticatedDoctor.getPosition();
+            System.out.println("Doctor Position: " + userPosition);
 
             if ("admin".equalsIgnoreCase(userPosition)) {
                 return new PositionResponse("admin");
@@ -102,6 +102,9 @@ public class LoginController {
             session.invalidate();
         }
         return "redirect:/login";
+    }
+
+    public record PositionResponse(@JsonProperty("position") String position) {
     }
 
 }

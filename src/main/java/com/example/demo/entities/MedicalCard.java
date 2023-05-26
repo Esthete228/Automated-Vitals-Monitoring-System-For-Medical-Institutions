@@ -21,10 +21,6 @@ public class MedicalCard {
     public MedicalCard() {
     }
 
-    public MedicalCard(String conclusion) {
-        this.conclusion = conclusion;
-    }
-
     public int getId() {
         return id;
     }
