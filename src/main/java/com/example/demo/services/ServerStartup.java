@@ -1,6 +1,6 @@
-package com.example.demo;
+package com.example.demo.services;
 
-import com.example.demo.services.VitalsGenerator;
+import com.example.demo.entities.VitalsGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

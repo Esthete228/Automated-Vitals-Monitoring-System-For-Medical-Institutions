@@ -1,7 +1,5 @@
-package com.example.demo.services;
+package com.example.demo.entities;
 
-import com.example.demo.entities.HealthState;
-import com.example.demo.entities.PatientHistory;
 import com.example.demo.repositories.HealthStateRepository;
 import com.example.demo.repositories.PatientHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;

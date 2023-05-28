@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MedicalCardRepository extends JpaRepository<MedicalCard, Integer> {
+    MedicalCard findById(int id);
 }

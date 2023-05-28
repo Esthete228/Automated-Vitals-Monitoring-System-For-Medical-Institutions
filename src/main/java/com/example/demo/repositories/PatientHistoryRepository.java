@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface PatientHistoryRepository extends JpaRepository<PatientHistory, Long> {
     List<PatientHistory> findByPatient(Patient patient);
-
 }
