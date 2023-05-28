@@ -31,6 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-*.java
-src/main/java/com/example/demo/controllers/PositionResponse.java
-src/main/java/com/example/demo/controllers/LoginController.java

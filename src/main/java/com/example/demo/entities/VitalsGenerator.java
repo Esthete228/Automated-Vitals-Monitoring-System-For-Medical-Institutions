@@ -91,7 +91,7 @@ public class VitalsGenerator {
         patientHistoryEntry.setSystolicBP(systolicBP);
         patientHistoryEntry.setDiastolicBP(diastolicBP);
         patientHistoryEntry.setTemperature(temperature);
-        patientHistoryEntry.setOxygen_Saturation(oxygenSaturation);
+        patientHistoryEntry.setOxygen_saturation(oxygenSaturation);
         patientHistoryEntry.setTimestamp(new Date());
 
         // Збереження історії хвороби пацієнта в базі даних
