@@ -23,6 +23,7 @@
 <div id="patientSelectContainer">
   <label for=patientSelect>Select Patients:</label>
   <select id="patientSelect" multiple size="5">
+    <option value="">Select patients log</option>
   </select>
   <br><br>
   <button id="startReviewBtn" onclick="showPatientHistory()">Show patient history</button>
@@ -68,8 +69,8 @@
                   data.patientHistory.forEach(history => {
                     const historyItem = document.createElement("li");
 
-                    // Update property names to match the field names in the entity class
-                    const content = `Heart Rate: ${history.heart_rate}, Systolic BP: ${history.systolicBP}, Diastolic BP: ${history.diastolicBP}, Oxygen Saturation: ${history.oxygen_saturation}, Temperature: ${history.temperature}, Timestamp: ${history.timestamp} `;
+                    // Ствоення вмісту кожного елемента історії, використовуючи певні властивості
+                    const content = `Heart Rate: ${history.heartRate}, Systolic BP: ${history.systolicBP}, Diastolic BP: ${history.diastolicBP}, Oxygen Saturation: ${history.oxygenSaturation}, Temperature: ${history.temperature}`;
 
                     historyItem.textContent = content;
                     historyList.appendChild(historyItem);
@@ -91,5 +92,6 @@
     }
   }
 </script>
+
 </body>
 </html>

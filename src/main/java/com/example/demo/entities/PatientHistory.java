@@ -11,17 +11,17 @@ public class PatientHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY) private int ID;
     @OneToOne @JoinColumn(name = "patientID") private Patient patient;
 
-    @Column(name = "Heart_Rate") private int heart_rate;
+    @Column(name = "Heart_Rate") private int Heart_rate;
 
-    @Column(name = "SystolicBP") private int systolicBP;
+    @Column(name = "SystolicBP") private int SystolicBP;
 
-    @Column(name = "DiastolicBP") private int diastolicBP;
+    @Column(name = "DiastolicBP") private int DiastolicBP;
 
-    @Column(name = "Oxygen_Saturation") private int oxygen_saturation;
+    @Column(name = "Oxygen_Saturation") private int Oxygen_Saturation;
 
-    @Column(name = "Temperature") private double temperature;
+    @Column(name = "Temperature") private double Temperature;
 
-    @Column(name = "Timestamp") private java.util.Date timestamp;
+    @Column(name = "Timestamp") private java.util.Date Timestamp;
 
 
     // Геттери та сеттери
@@ -42,50 +42,50 @@ public class PatientHistory {
     }
 
     public int getHeart_rate() {
-        return heart_rate;
+        return Heart_rate;
     }
 
     public void setHeart_rate(int heart_rate) {
-        this.heart_rate = heart_rate;
+        Heart_rate = heart_rate;
     }
 
     public int getSystolicBP() {
-        return systolicBP;
+        return SystolicBP;
     }
 
     public void setSystolicBP(int systolicBP) {
-        this.systolicBP = systolicBP;
+        SystolicBP = systolicBP;
     }
 
     public int getDiastolicBP() {
-        return diastolicBP;
+        return DiastolicBP;
     }
 
     public void setDiastolicBP(int diastolicBP) {
-        this.diastolicBP = diastolicBP;
+        DiastolicBP = diastolicBP;
     }
 
-    public int getOxygen_saturation() {
-        return oxygen_saturation;
+    public int getOxygen_Saturation() {
+        return Oxygen_Saturation;
     }
 
-    public void setOxygen_saturation(int oxygen_saturation) {
-        this.oxygen_saturation = oxygen_saturation;
+    public void setOxygen_Saturation(int oxygen_Saturation) {
+        Oxygen_Saturation = oxygen_Saturation;
     }
 
     public double getTemperature() {
-        return temperature;
+        return Temperature;
     }
 
     public void setTemperature(double temperature) {
-        this.temperature = temperature;
+        Temperature = temperature;
     }
 
     public Date getTimestamp() {
-        return timestamp;
+        return Timestamp;
     }
 
     public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+        Timestamp = timestamp;
     }
 }
