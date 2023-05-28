@@ -22,6 +22,9 @@ public class Patient {
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private MedicalCard medicalCard;
 
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
 
 
     // Геттери та сеттери
@@ -68,4 +71,12 @@ public class Patient {
     public void setMedicalCard(MedicalCard medicalCard) {
         this.medicalCard = medicalCard;
     }
+        public Department getDepartment() {
+            return department;
+        }
+
+        public void setDepartment(Department department) {
+            this.department = department;
+        }
+
 }

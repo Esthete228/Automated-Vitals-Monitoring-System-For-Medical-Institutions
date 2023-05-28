@@ -26,8 +26,13 @@
     <input type="password" id="password" required>
 
     <label for=position>Position:</label>
-    <input type="text" id="position" required>
-
+    <select id="position" required>
+      <option value="DOCTOR">Doctor</option>
+      <option value="SENIOR">Senior</option>
+    </select>
+    <label for=department>Department:</label>
+    <select id="department" name="department" required>
+    </select>
     <button type="submit">Register</button>
   </form>
 </div>
@@ -39,11 +44,15 @@
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
     const position = document.getElementById("position").value;
+    const departmentName = document.getElementById("departmentName").value;
 
     const userData = {
       username: username,
       password: password,
-      position: position
+      position: position,
+      department: {
+        name: departmentName
+      }
     };
 
     // Виконання POST-запиту до бекенд-сервера для реєстрації користувача
