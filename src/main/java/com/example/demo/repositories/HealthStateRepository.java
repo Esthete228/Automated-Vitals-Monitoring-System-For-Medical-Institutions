@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface HealthStateRepository extends JpaRepository<HealthState, Long> {
+public interface HealthStateRepository extends JpaRepository<HealthState, Integer> {
     HealthState findByPatient(Patient patient);
 }

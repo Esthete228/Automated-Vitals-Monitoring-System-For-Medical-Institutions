@@ -2,8 +2,6 @@ package com.example.demo.services;
 
 import com.example.demo.entities.HealthState;
 import com.example.demo.entities.PatientHistory;
-import com.example.demo.repositories.HealthStateRepository;
-import com.example.demo.repositories.PatientHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,21 +9,20 @@ import java.util.*;
 
 @Service
 public class VitalsGenerator {
-    private final HealthStateRepository healthStateRepository;
-    private final PatientHistoryRepository patientHistoryRepository;
+    private final HealthStateService healthStateService;
+    private final PatientHistoryService patientHistoryService;
     private final Map<Integer, Timer> timers;
 
     @Autowired
     public VitalsGenerator(
-            HealthStateRepository healthStateRepository, PatientHistoryRepository patientHistoryRepository) {
-        this.healthStateRepository = healthStateRepository;
-        this.patientHistoryRepository = patientHistoryRepository;
+            HealthStateService healthStateService, PatientHistoryService patientHistoryService) {
+        this.healthStateService = healthStateService;
+        this.patientHistoryService = patientHistoryService;
         this.timers = new HashMap<>();
     }
 
     public void startGeneratingDataForAllHealthStates() {
-        List<HealthState> healthStates =
-                healthStateRepository.findAll();
+        List<HealthState> healthStates = healthStateService.getAllHealthStates();
         for (HealthState healthState : healthStates) {
             startGeneratingData(healthState);
         }
@@ -42,19 +39,13 @@ public class VitalsGenerator {
 
             Timer timer = new Timer();
             // запланування запуску завдання кожні 5 секунд
-            timer.scheduleAtFixedRate(
-                    task, 0, 5000); // Налаштування інтервалу
+            timer.scheduleAtFixedRate(task, 0, 5000);
 
             timers.put(healthState.getID(), timer);
         }
     }
 
-    private void generateAndSaveData(
-            HealthState healthState) {
-        // Генерація нових даних для стану здоров'я
-        // Оновлення стану здоров'я згенерованими даними
-        // Збереження оновленого стану здоров'я в базі даних
-
+    private void generateAndSaveData(HealthState healthState) {
         Random random = new Random();
 
         // Середні значення
@@ -82,8 +73,7 @@ public class VitalsGenerator {
         healthState.setOxygen_saturation(oxygenSaturation);
 
         // Збереження оновленого стану здоров'я в базі даних
-        healthStateRepository.save(healthState);
-
+        healthStateService.saveHealthState(healthState);
 
 
         // Створрення нового запису в історії хвороби
@@ -97,6 +87,6 @@ public class VitalsGenerator {
         patientHistoryEntry.setTimestamp(new Date());
 
         // Збереження історії хвороби пацієнта в базі даних
-        patientHistoryRepository.save(patientHistoryEntry);
+        patientHistoryService.savePatientHistory(patientHistoryEntry);
     }
 }

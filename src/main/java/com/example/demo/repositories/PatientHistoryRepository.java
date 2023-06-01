@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-@Repository
-public interface PatientHistoryRepository extends JpaRepository<PatientHistory, Long> {
-    List<PatientHistory> findByPatient(Patient patient);
 
+@Repository
+public interface PatientHistoryRepository extends JpaRepository<PatientHistory, Integer> {
+    List<PatientHistory> findByPatient(Patient patient);
 }

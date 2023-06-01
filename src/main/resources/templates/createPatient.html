@@ -5,8 +5,6 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-
-
 <div class="top-bar">
   <div class="bar-theme top-bar top-bar-large">
     <a href="/home" class="bar-item theme-l1">
@@ -17,7 +15,7 @@
 
 <h1>Create Patient</h1>
 
-<form action="/patients" method="post">
+<form id="registerPatientForm" onsubmit="registerPatient(event)">
 
   <div>
     <label for=firstName>First Name:</label>
@@ -45,9 +43,91 @@
   </div>
 
   <div>
+    <label for=departmentId>Department:</label>
+    <select id="departmentId" name="departmentId" required>
+      <option value="">Select Department</option>
+    </select>
+  </div>
+
+  <div>
     <button type="submit">Create</button>
   </div>
 
 </form>
+
+<script>
+  function registerPatient(event) {
+    event.preventDefault(); // Prevent form submission
+
+    const firstName = document.getElementById("firstName").value;
+    const lastName = document.getElementById("lastName").value;
+    const age = document.getElementById("age").value;
+    const gender = document.getElementById("gender").value;
+    const departmentId = document.getElementById("departmentId").value;
+    const departmentName = document.getElementById("departmentId").selectedOptions[0].text;
+
+    const patientData = {
+      firstName: firstName,
+      lastName: lastName,
+      age: age,
+      gender: gender,
+      department: {
+        id: departmentId,
+        name: departmentName
+      }
+    };
+
+    // Send a POST request to register the patient
+    fetch('/patients', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(patientData)
+    })
+            .then(response => {
+              // Handle the response
+              if (response.ok) {
+                console.log('Patient registered successfully');
+
+                // Redirect to a success page or perform any other action
+              } else {
+                console.error('Failed to register patient');
+              }
+            })
+            .catch(error => {
+              // Handle the error
+              console.error('Error:', error);
+            });
+  }
+
+  // Function to populate the department options
+  function populateDepartmentOptions() {
+    const departmentSelect = document.getElementById("departmentId");
+
+    // Fetch the department list from the server
+    fetch('/departments/list')
+            .then(response => response.json())
+            .then(data => {
+              // Clear the existing options
+              departmentSelect.innerHTML = '';
+
+              // Add the new options
+              data.forEach(department => {
+                const option = document.createElement("option");
+                option.value = department.id;
+                option.text = department.name;
+                departmentSelect.appendChild(option);
+              });
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+  }
+
+  // Call the function to populate the options when the page loads
+  window.addEventListener('load', populateDepartmentOptions);
+</script>
+
 </body>
 </html>

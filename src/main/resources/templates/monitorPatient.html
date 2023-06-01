@@ -53,35 +53,6 @@
   const vitalTableBody = document.getElementById("vitalTableBody");
   const selectedPatients = [];
 
-  // Приймач подій для кнопки "Почати моніторинг
-  startMonitoringBtn.addEventListener("click", () => {
-    const selectedPatientIds = Array.from(select.selectedOptions).map(option => option.value);
-    if (selectedPatientIds.length > 0) {
-      selectedPatients.push(...selectedPatientIds);
-      select.disabled = true;
-      startMonitoringBtn.disabled = true;
-      patientSelectContainer.style.display = "none";
-      selectedPatients.forEach(patientId => startDataRefresh(patientId));
-    } else {
-      alert("Please select at least one patient.");
-    }
-  });
-
-  // Отримання списку пацієнтів і заповнення випадаючого списку
-  fetch('/fetchPatients')
-          .then(response => response.json())
-          .then(data => {
-            data.forEach(patient => {
-              const option = document.createElement("option");
-              option.value = patient.id;
-              option.text = `${patient.firstName} ${patient.lastName}`;
-              select.appendChild(option);
-            });
-          })
-          .catch(error => {
-            console.error('Error fetching patients:', error);
-          });
-
   function createVitalRow(patientId) {
     const row = document.createElement("tr");
     row.id = `vitalRow_${patientId}`;
@@ -137,47 +108,47 @@
     document.getElementById(`temperature_${patientId}`).innerText = vitals.temperature;
     document.getElementById(`oxygen_saturation_${patientId}`).innerText = vitals.oxygen_saturation;
 
-    // Перевірка життєвих показників та оновлення статусу
+    // Check vital signs and update status
     checkVitals(patientId, vitals);
   }
 
   function checkVitals(patientId, vitals) {
-    // Перевірка серцебиття
+    // Check heart rate
     if (vitals.heart_rate > 100 || vitals.heart_rate < 60) {
-      alert(`Patient ${patientId}: Heart rate is out of normal range!`);
-      displayStatus(patientId, 'heart_rate', 'Vital signs are not in normal range.');
+      alert(`Patient ${patientId}: Heart rate is out of the normal range!`);
+      displayStatus(patientId, 'heart_rate', 'Vital signs are not in the normal range.');
     } else {
       displayStatus(patientId, 'heart_rate', 'Normal.');
     }
 
-    // Перевірка систолічного артеріального тиску
+    // Check systolic blood pressure
     if (vitals.systolicBP > 140 || vitals.systolicBP < 80) {
-      alert(`Patient ${patientId}: Systolic blood pressure is out of normal range!`);
-      displayStatus(patientId, 'systolic_bp', 'Vital signs are not in normal range.');
+      alert(`Patient ${patientId}: Systolic blood pressure is out of the normal range!`);
+      displayStatus(patientId, 'systolic_bp', 'Vital signs are not in the normal range.');
     } else {
       displayStatus(patientId, 'systolic_bp', 'Normal.');
     }
 
-    // Перевірка діастолічного артеріального тиску
+    // Check diastolic blood pressure
     if (vitals.diastolicBP > 100 || vitals.diastolicBP < 40) {
-      alert(`Patient ${patientId}: Diastolic blood pressure is out of normal range!`);
-      displayStatus(patientId, 'diastolic_bp', 'Vital signs are not in normal range.');
+      alert(`Patient ${patientId}: Diastolic blood pressure is out of the normal range!`);
+      displayStatus(patientId, 'diastolic_bp', 'Vital signs are not in the normal range.');
     } else {
       displayStatus(patientId, 'diastolic_bp', 'Normal.');
     }
 
-    // Перевірка температури
+    // Check temperature
     if (vitals.temperature > 41.2 || vitals.temperature < 30.0) {
-      alert(`Patient ${patientId}: Temperature is out of normal range!`);
-      displayStatus(patientId, 'temperature', 'Vital signs are not in normal range.');
+      alert(`Patient ${patientId}: Temperature is out of the normal range!`);
+      displayStatus(patientId, 'temperature', 'Vital signs are not in the normal range.');
     } else {
       displayStatus(patientId, 'temperature', 'Normal.');
     }
 
-    // Перевірка насичення киснем
+    // Check oxygen saturation
     if (vitals.oxygen_saturation < 50) {
-      alert(`Patient ${patientId}: Oxygen saturation is below normal range!`);
-      displayStatus(patientId, 'oxygen_saturation', 'Vital signs are not in normal range.');
+      alert(`Patient ${patientId}: Oxygen saturation is below the normal range!`);
+      displayStatus(patientId, 'oxygen_saturation', 'Vital signs are not in the normal range.');
     } else {
       displayStatus(patientId, 'oxygen_saturation', 'Normal.');
     }
@@ -187,11 +158,44 @@
     document.getElementById(`${parameterId}_status_${patientId}`).innerText = statusMessage;
   }
 
+  // Fetch patients and populate the select dropdown
+  fetch('/fetchPatients')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error fetching patients');
+            }
+            return response.json();
+          })
+          .then(data => {
+            data.forEach(patient => {
+              const option = document.createElement("option");
+              option.value = patient.id;
+              option.text = `${patient.firstName} ${patient.lastName}`;
+              select.appendChild(option);
+            });
+          })
+          .catch(error => {
+            console.error('Error fetching patients:', error);
+          });
+
+  // Event listener for "Start Monitoring" button
+  startMonitoringBtn.addEventListener("click", () => {
+    const selectedPatientIds = Array.from(select.selectedOptions).map(option => option.value);
+    if (selectedPatientIds.length > 0) {
+      selectedPatients.push(...selectedPatientIds);
+      select.disabled = true;
+      startMonitoringBtn.disabled = true;
+      patientSelectContainer.style.display = "none";
+      selectedPatients.forEach(patientId => startDataRefresh(patientId));
+    } else {
+      alert("Please select at least one patient.");
+    }
+  });
 
   function startDataRefresh(patientId) {
     createVitalRow(patientId);
 
-    // Отримання початкових даних про життєві показники та оновити інтерфейс
+    // Get initial vital data and update the interface
     fetch(`/monitorPatient/${patientId}/vitals`)
             .then(response => response.json())
             .then(vitals => {
@@ -201,7 +205,7 @@
               console.error(`Error fetching vitals data for patient ${patientId}:`, error);
             });
 
-    // Налаштування періодичного оновлення даних кожні 5 секунд
+    // Set up periodic data refresh every 5 seconds
     setInterval(() => {
       fetch(`/monitorPatient/${patientId}/vitals`)
               .then(response => response.json())

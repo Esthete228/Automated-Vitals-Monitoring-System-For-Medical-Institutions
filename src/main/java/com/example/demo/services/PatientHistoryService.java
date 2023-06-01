@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service
 public class PatientHistoryService {
+
     private final PatientHistoryRepository patientHistoryRepository;
 
     @Autowired
@@ -19,5 +20,9 @@ public class PatientHistoryService {
 
     public List<PatientHistory> getPatientHistoryByPatient(Patient patient) {
         return patientHistoryRepository.findByPatient(patient);
+    }
+
+    public void savePatientHistory(PatientHistory patientHistory) {
+        patientHistoryRepository.save(patientHistory);
     }
 }

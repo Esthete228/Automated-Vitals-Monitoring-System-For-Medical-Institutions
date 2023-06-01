@@ -1,11 +1,16 @@
 package com.example.demo.controllers;
 
-import com.example.demo.entities.User;
-import com.example.demo.repositories.UserRepository;
-import com.example.demo.services.PositionResponse;
+import com.example.demo.entities.Department;
+import com.example.demo.entities.Doctor;
+import com.example.demo.services.DoctorService;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
@@ -19,13 +24,16 @@ import javax.validation.constraints.NotEmpty;
 @Controller
 @Validated
 public class LoginController {
-    private final UserRepository userRepository;
+    private final DoctorService doctorService;
+    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public LoginController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public LoginController(DoctorService doctorService, UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+        this.doctorService = doctorService;
+        this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
     }
-
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
@@ -38,19 +46,20 @@ public class LoginController {
             HttpServletRequest request,
             Model model
     ) {
-        // Знаходимо користувача по змінній username
-        User user = userRepository.findByUsername(username);
+        // Retrieve the user details based on the entered username
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // Перевіряємо чи користувач існує і чи був правильно введений пароль
-        if (user != null && user.getPassword().equals(password)) {
-            // Користувач успішно автентифікований, зберігаємо ім'я користувача в сесії
+        // Check if the entered password matches the encoded password from the user details
+        if (userDetails != null && passwordEncoder.matches(password, userDetails.getPassword())) {
+            // User successfully authenticated, save the username in the session
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
 
-            // Перенаправлення на домашню сторінку
+            // Redirect to the home page
             return "redirect:/home";
         } else {
-            // Невірне ім'я користувача або пароль
+            // Invalid username or password
+            System.out.println("Login failed for username: " + username);
             model.addAttribute("error", "Invalid username or password");
             return "login";
         }
@@ -60,40 +69,27 @@ public class LoginController {
     @ResponseBody
     public PositionResponse getPosition(HttpServletRequest request) {
         // Отримуємо поточне автентифіковане ім'я користувача з сеансу
-        String authenticatedUsername = getAuthenticatedUsername(request);
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
         // Вивід у консоль для перевірки автентифікованого імені користувача
         System.out.println("Authenticated Username: " + authenticatedUsername);
 
         // Отримуємо користувача зі сховища або бази даних на основі імені користувача
-        User authenticatedUser = userRepository.findByUsername(authenticatedUsername);
+        Doctor authenticatedDoctor = doctorService.findByUsername(authenticatedUsername);
 
         // Вивід у консоль для перевірки значення автентифікованого користувача та поля position
-        System.out.println("Retrieved User: " + authenticatedUser);
-        if (authenticatedUser != null) {
-            String userPosition = authenticatedUser.getPosition();
-            System.out.println("User Position: " + userPosition);
+        System.out.println("Retrieved Doctor: " + authenticatedDoctor);
+        if (authenticatedDoctor != null) {
+            String userPosition = authenticatedDoctor.getPosition();
+            Department userDepartment = authenticatedDoctor.getDepartment();
+            System.out.println("Doctor Position: " + userPosition);
+            System.out.println("Doctor Department: " + userDepartment);
 
-            if ("admin".equalsIgnoreCase(userPosition)) {
-                return new PositionResponse("admin");
-            } else if ("senior".equalsIgnoreCase(userPosition)) {
-                return new PositionResponse("senior");
-            } else if ("doctor".equalsIgnoreCase(userPosition)) {
-                return new PositionResponse("doctor");
-        }
+            return new PositionResponse(userPosition, userDepartment);
         }
         // Повернути position за замовчуванням, якщо позицію користувача не розпізнано
-        return new PositionResponse("unknown");
+        return new PositionResponse("unknown", null);
     }
-
-    private String getAuthenticatedUsername(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            return (String) session.getAttribute("username");
-        }
-        return null;
-    }
-
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -104,4 +100,6 @@ public class LoginController {
         return "redirect:/login";
     }
 
+    public record PositionResponse(@JsonProperty("position") String position, @JsonProperty("department") Department department) {
+    }
 }

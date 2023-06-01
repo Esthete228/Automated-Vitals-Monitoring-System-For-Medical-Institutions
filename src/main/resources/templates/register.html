@@ -17,7 +17,7 @@
 </div>
 
 <div class="container">
-  <h1>User Registration</h1>
+  <h1>Doctor Registration</h1>
   <form id="registerForm" onsubmit="registerUser(event)">
     <label for=username>Username:</label>
     <input type="text" id="username" required>
@@ -26,36 +26,42 @@
     <input type="password" id="password" required>
 
     <label for=position>Position:</label>
-    <select id="position" required>
-      <option value="DOCTOR">Doctor</option>
-      <option value="SENIOR">Senior</option>
+    <select id="position" name="position" required>
+      <option value="">--Please select an option--</option>
+      <option value="admin">admin</option>
+      <option value="senior">senior</option>
+      <option value="doctor">doctor</option>
     </select>
-    <label for=department>Department:</label>
-    <select id="department" name="department" required>
+
+    <label for=departmentId>Department:</label>
+    <select id="departmentId" name="departmentId" required>
+      <option value="">Select Department</option>
     </select>
+
     <button type="submit">Register</button>
   </form>
 </div>
-
 <script>
   function registerUser(event) {
-    event.preventDefault(); // Заборона надсилання форми
+    event.preventDefault(); // Prevent form submission
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
     const position = document.getElementById("position").value;
-    const departmentName = document.getElementById("departmentName").value;
+    const departmentId = document.getElementById("departmentId").value;
+    const departmentName = document.getElementById("departmentId").selectedOptions[0].text;
 
     const userData = {
       username: username,
       password: password,
       position: position,
       department: {
+        id: departmentId,
         name: departmentName
       }
     };
 
-    // Виконання POST-запиту до бекенд-сервера для реєстрації користувача
+    // Send a POST request to register the user
     fetch('/register', {
       method: 'POST',
       headers: {
@@ -63,18 +69,47 @@
       },
       body: JSON.stringify(userData)
     })
+            .then(response => {
+              // Handle the response
+              if (response.ok) {
+                console.log('Doctor registered successfully');
+                // Redirect to a success page or perform any other action
+              } else {
+                console.error('Failed to register doctor');
+              }
+            })
+            .catch(error => {
+              // Handle the error
+              console.error('Error:', error);
+            });
+  }
+
+  // Function to populate the department options
+  function populateDepartmentOptions() {
+    const departmentSelect = document.getElementById("departmentId");
+
+    // Fetch the department list from the server
+    fetch('/departments/list')
             .then(response => response.json())
             .then(data => {
-              // Обробити відповідь від сервера
-              console.log(data);
-              alert("User registered successfully!");
-              document.getElementById("registerForm").reset(); // Скинути форму
+              // Clear the existing options
+              departmentSelect.innerHTML = '';
+
+              // Add the new options
+              data.forEach(department => {
+                const option = document.createElement("option");
+                option.value = department.id;
+                option.text = department.name;
+                departmentSelect.appendChild(option);
+              });
             })
             .catch(error => {
               console.error('Error:', error);
-              alert("An error occurred during registration. Please try again.");
             });
   }
+
+  // Call the function to populate the options when the page loads
+  window.addEventListener('load', populateDepartmentOptions);
 </script>
 
 </body>

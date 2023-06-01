@@ -25,6 +25,8 @@ public class PatientHistory {
 
 
     // Геттери та сеттери
+
+
     public int getID() {
         return ID;
     }

@@ -76,21 +76,25 @@
     }
 
     // Function to fetch patients and populate the select dropdown
-    function fetchPatients() {
-        fetch('/fetchPatients')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(patient => {
-                    const option = document.createElement("option");
-                    option.value = patient.id;
-                    option.text = `${patient.firstName} ${patient.lastName}`;
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching patients:', error);
+    // Fetch patients and populate the select dropdown
+    fetch('/fetchPatients')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error fetching patients');
+            }
+            return response.json();
+        })
+        .then(data => {
+            data.forEach(patient => {
+                const option = document.createElement("option");
+                option.value = patient.id;
+                option.text = `${patient.firstName} ${patient.lastName}`;
+                select.appendChild(option);
             });
-    }
+        })
+        .catch(error => {
+            console.error('Error fetching patients:', error);
+        });
 
     // Event listener for patient select change
     select.addEventListener("change", () => {

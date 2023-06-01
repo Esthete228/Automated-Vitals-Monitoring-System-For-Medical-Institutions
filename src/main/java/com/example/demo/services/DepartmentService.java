@@ -1,33 +1,54 @@
 package com.example.demo.services;
 
 import com.example.demo.entities.Department;
-import com.example.demo.entities.Doctor;
 import com.example.demo.repositories.DepartmentRepository;
-import com.example.demo.repositories.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class DepartmentService {
 
     private final DepartmentRepository departmentRepository;
-    private final DoctorRepository doctorRepository;
 
     @Autowired
-    public DepartmentService(DepartmentRepository departmentRepository, DoctorRepository doctorRepository) {
+    public DepartmentService(DepartmentRepository departmentRepository) {
         this.departmentRepository = departmentRepository;
-        this.doctorRepository = doctorRepository;
     }
 
-    public Department getDepartmentByDoctorId(Long doctorId) {
-        Doctor doctor = doctorRepository.findById(doctorId).orElse(null);
-        if (doctor != null) {
-            return departmentRepository.findById(doctor.getDepartment().getId()).orElse(null);
-        }
-        return null;
+    public List<Department> getAllDepartments() {
+        return departmentRepository.findAll();
+    }
+
+    public Department getDepartmentById(int id) {
+        return departmentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Department not found"));
+    }
+
+    public void createDepartment(Department department) {
+        departmentRepository.save(department);
+    }
+
+    public Department updateDepartment(int id, Department updatedDepartment) {
+        Department department = getDepartmentById(id);
+
+        department.setName(updatedDepartment.getName());
+
+        return departmentRepository.save(department);
+    }
+
+    public void deleteDepartment(int id) {
+        Department department = getDepartmentById(id);
+        departmentRepository.delete(department);
     }
 
     public void saveDepartment(Department department) {
         departmentRepository.save(department);
+    }
+
+    public boolean doesDepartmentExist(int departmentId) {
+        return departmentRepository.existsById(departmentId);
     }
 }

@@ -2,11 +2,15 @@ package com.example.demo.controllers;
 
 import com.example.demo.entities.*;
 import com.example.demo.services.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class ServerController {
@@ -26,21 +31,21 @@ public class ServerController {
     private final MedicalCardService medicalCardService;
     private final PatientHistoryService patientHistoryService;
     private final DoctorService doctorService;
-    private final VitalsGenerator vitalsGenerator;
     private final DepartmentService departmentService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public ServerController(PatientService patientService, HealthStateService healthStateService,
                             MedicalCardService medicalCardService, PatientHistoryService patientHistoryService,
-                            DoctorService doctorService, VitalsGenerator vitalsGenerator,
-                            DepartmentService departmentService) {
+                            DoctorService doctorService,
+                            DepartmentService departmentService, PasswordEncoder passwordEncoder) {
         this.patientService = patientService;
         this.healthStateService = healthStateService;
         this.medicalCardService = medicalCardService;
         this.patientHistoryService = patientHistoryService;
         this.doctorService = doctorService;
-        this.vitalsGenerator = vitalsGenerator;
         this.departmentService = departmentService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping(value = "/home")
@@ -48,31 +53,71 @@ public class ServerController {
         return "home";
     }
 
-    @PostMapping(value = "/patients", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String createPatient(@ModelAttribute @Validated Patient patient, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "error";
-        }
-
-        try {
-            patientService.createPatient(patient);
-
-            HealthState healthState = new HealthState();
-            healthState.setPatient(patient);
-            healthStateService.saveHealthState(healthState);
-
-            vitalsGenerator.startGeneratingData(healthState);
-
-            return "/success";
-        } catch (Exception e) {
-            return "error";
-        }
-    }
 
     @GetMapping("/patients")
     public String patients(Model model) {
         model.addAttribute("patient", new Patient());
         return "createPatient";
+    }
+    @PostMapping("/patients")
+    public ResponseEntity<String> registerPatient(@Validated @RequestBody Patient patient, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body("{\"message\": \"Validation failed\"}");
+        }
+
+        try {
+
+            // Save the patient and the associated medical card
+            patientService.savePatient(patient);
+
+            return ResponseEntity.ok("{\"message\": \"Patient registered successfully\"}");
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"message\": \"Database error\"}");
+        } catch (Exception e) {
+            e.printStackTrace(); // Print the exception stack trace
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"message\": \"Unknown error\"}");
+        }
+    }
+
+    @GetMapping("/register")
+    public String showRegistrationForm(Model model) {
+        model.addAttribute("doctor", new Doctor());
+        return "register";
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@Validated @RequestBody Doctor doctor, BindingResult bindingResult,
+                                               HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            Department department = (Department) session.getAttribute("department");
+            if (department != null) {
+                System.out.println("Department found in session: " + department.getName());
+            } else {
+                System.out.println("Department not found in session");
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body("{\"message\": \"Validation failed\"}");
+        }
+
+        try {
+            String password = doctor.getPassword();
+            String encryptedPassword = passwordEncoder.encode(password);
+            doctor.setPassword(encryptedPassword);
+            doctorService.saveDoctor(doctor);
+            return ResponseEntity.ok("{\"message\": \"Doctor registered successfully\"}");
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"message\": \"Database error\"}");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"message\": \"Unknown error\"}");
+        }
     }
 
     @GetMapping("/monitorPatient/{id}")
@@ -92,51 +137,57 @@ public class ServerController {
 
     @GetMapping("/monitorPatient/{id}/vitals")
     @ResponseBody
-    public HealthState getVitalsData(@PathVariable("id") int id) {
+    public ResponseEntity<HealthState> getVitalsData(@PathVariable("id") int id) {
         Optional<Patient> optionalPatient = patientService.getPatientById(id);
         if (optionalPatient.isPresent()) {
             Patient patient = optionalPatient.get();
-            return healthStateService.getHealthStateByPatient(patient);
+            HealthState healthState = healthStateService.getHealthStateByPatient(patient);
+            return ResponseEntity.ok(healthState);
         } else {
-            return null;
+            return ResponseEntity.notFound().build();
         }
     }
 
 
     @GetMapping("/fetchPatients")
     @ResponseBody
-    public List<Patient> fetchPatients() {
-        return patientService.getAllPatients();
+    public List<Patient> fetchPatients(HttpServletRequest request) {
+        // Get the logged-in doctor's department ID
+        Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
+        int departmentId = authenticatedDoctor.getDepartment().getId();
+
+        // Fetch patients based on the department ID
+
+        return patientService.getPatientsByDepartmentId(departmentId);
+    }
+
+    @GetMapping("/fetchDoctors")
+    @ResponseBody
+    public List<Doctor> fetchDoctors(HttpServletRequest request) {
+        // Get the logged-in doctor's department ID
+        Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
+        int departmentId = authenticatedDoctor.getDepartment().getId();
+
+        // Fetch doctors based on the department ID and role "doctor"
+        List<Doctor> doctors = doctorService.getDoctorsByDepartmentId(departmentId);
+
+        // Filter the doctors based on their role
+        List<Doctor> filteredDoctors = doctors.stream()
+                .filter(doctor -> doctor.getPosition().equals("doctor"))
+                .collect(Collectors.toList());
+
+        return filteredDoctors;
+    }
+
+
+    private Doctor getAuthenticatedDoctor(HttpServletRequest request) {
+        String authenticatedUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        return doctorService.findByUsername(authenticatedUsername);
     }
 
     @GetMapping("/monitorPatient")
     public String monitorPatient() {
         return "monitorPatient";
-    }
-
-    @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
-        model.addAttribute("user", new Doctor());
-        return "register";
-    }
-
-
-    @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public ResponseEntity<String> registerUser(@RequestBody @Validated Doctor doctor, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("{\"message\": \"Validation error\"}");
-        }
-
-        try {
-            doctorService.createDoctor(doctor);
-
-            return ResponseEntity.ok("{\"message\": \"Doctor registered successfully\"}");
-        } catch (DataAccessException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Database error\"}");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"message\": \"Unknown error\"}");
-        }
     }
 
     @GetMapping("/patientLog")
@@ -194,7 +245,6 @@ public class ServerController {
         if (conclusion == null) {
             return ResponseEntity.badRequest().body("Conclusion not provided");
         }
-
         Optional<Patient> optionalPatient = patientService.getPatientById(patientId);
         if (optionalPatient.isPresent()) {
             Patient patient = optionalPatient.get();
@@ -227,4 +277,44 @@ public class ServerController {
         departmentService.saveDepartment(department); // Assuming the method to save/update a department is named 'saveDepartment'
         return "redirect:/departments";
     }
+
+    @GetMapping("/departments/list")
+    @ResponseBody
+    public List<Department> getDepartmentList() {
+        return departmentService.getAllDepartments();
+    }
+
+
+    @GetMapping("/assign")
+    public String assignPatients(Model model) {
+        List<Patient> patients = patientService.getAllPatients();
+        List<Doctor> doctors = doctorService.getAllDoctors();
+        List<Department> departments = departmentService.getAllDepartments();
+        model.addAttribute("patients", patients);
+        model.addAttribute("doctors", doctors);
+        model.addAttribute("departments", departments);
+        return "assignPatients";
+    }
+
+//    @PostMapping("/assign")
+//    public String saveAssignments(@RequestParam("patientId") int patientId, @RequestParam("doctorId") int doctorId) {
+//        Optional<Patient> optionalPatient = patientService.getPatientById(patientId);
+//        Optional<Doctor> optionalDoctor = doctorService.getDoctorById(doctorId);
+//
+//        if (optionalPatient.isPresent() && optionalDoctor.isPresent()) {
+//            Patient patient = optionalPatient.get();
+//            Doctor doctor = optionalDoctor.get();
+//
+//            Department department = patient.getDepartment();
+//
+//            // Grant visibility permission for the doctor to see patients in the same department
+////            doctorService.grantVisibility(doctor, department.getId());
+//
+//            // Set visibility to true for the assigned patient
+////            patient.setVisibility(true);
+//            patientService.savePatient(patient);
+//        }
+//
+//        return "redirect:/assign";
+//    }
 }

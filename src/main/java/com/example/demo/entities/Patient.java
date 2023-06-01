@@ -15,10 +15,6 @@ public class Patient {
     @Column(name = "Gender") private String gender;
 
 
-    public MedicalCard getMedicalCard() {
-        return medicalCard;
-    }
-
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private MedicalCard medicalCard;
 
@@ -67,16 +63,17 @@ public class Patient {
     public void setGender(String gender) {
         this.gender = gender;
     }
-
+    public MedicalCard getMedicalCard() {
+        return medicalCard;
+    }
     public void setMedicalCard(MedicalCard medicalCard) {
         this.medicalCard = medicalCard;
     }
-        public Department getDepartment() {
-            return department;
-        }
+    public Department getDepartment() {
+        return department;
+    }
 
-        public void setDepartment(Department department) {
-            this.department = department;
-        }
-
+    public void setDepartment(Department department) {
+        this.department = department;
+    }
 }
