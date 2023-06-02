@@ -10,5 +10,4 @@ import java.util.List;
 public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
     List<Patient> findByDepartmentId(int departmentId);
-
 }

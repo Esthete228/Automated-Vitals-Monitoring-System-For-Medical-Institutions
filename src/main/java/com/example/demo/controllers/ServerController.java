@@ -33,12 +33,13 @@ public class ServerController {
     private final DoctorService doctorService;
     private final DepartmentService departmentService;
     private final PasswordEncoder passwordEncoder;
+    private final AssignmentService assignmentService;
 
     @Autowired
     public ServerController(PatientService patientService, HealthStateService healthStateService,
                             MedicalCardService medicalCardService, PatientHistoryService patientHistoryService,
                             DoctorService doctorService,
-                            DepartmentService departmentService, PasswordEncoder passwordEncoder) {
+                            DepartmentService departmentService, PasswordEncoder passwordEncoder, AssignmentService assignmentService) {
         this.patientService = patientService;
         this.healthStateService = healthStateService;
         this.medicalCardService = medicalCardService;
@@ -46,6 +47,7 @@ public class ServerController {
         this.doctorService = doctorService;
         this.departmentService = departmentService;
         this.passwordEncoder = passwordEncoder;
+        this.assignmentService = assignmentService;
     }
 
     @GetMapping(value = "/home")
@@ -106,9 +108,6 @@ public class ServerController {
         }
 
         try {
-            String password = doctor.getPassword();
-            String encryptedPassword = passwordEncoder.encode(password);
-            doctor.setPassword(encryptedPassword);
             doctorService.saveDoctor(doctor);
             return ResponseEntity.ok("{\"message\": \"Doctor registered successfully\"}");
         } catch (DataAccessException e) {
@@ -172,11 +171,22 @@ public class ServerController {
         List<Doctor> doctors = doctorService.getDoctorsByDepartmentId(departmentId);
 
         // Filter the doctors based on their role
-        List<Doctor> filteredDoctors = doctors.stream()
+
+        return doctors.stream()
                 .filter(doctor -> doctor.getPosition().equals("doctor"))
                 .collect(Collectors.toList());
+    }
 
-        return filteredDoctors;
+    @GetMapping("/fetchAssignedPatients")
+    @ResponseBody
+    public List<Patient> fetchAssignedPatients(HttpServletRequest request){
+        // Get the logged-in doctor's department ID
+        Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
+        int doctorId = authenticatedDoctor.getID();
+
+        // Fetch patients based on the doctor's ID from the assignment table
+
+        return assignmentService.getAssignedPatientsByDoctorId(doctorId);
     }
 
 
@@ -296,25 +306,29 @@ public class ServerController {
         return "assignPatients";
     }
 
-//    @PostMapping("/assign")
-//    public String saveAssignments(@RequestParam("patientId") int patientId, @RequestParam("doctorId") int doctorId) {
-//        Optional<Patient> optionalPatient = patientService.getPatientById(patientId);
-//        Optional<Doctor> optionalDoctor = doctorService.getDoctorById(doctorId);
-//
-//        if (optionalPatient.isPresent() && optionalDoctor.isPresent()) {
-//            Patient patient = optionalPatient.get();
-//            Doctor doctor = optionalDoctor.get();
-//
-//            Department department = patient.getDepartment();
-//
-//            // Grant visibility permission for the doctor to see patients in the same department
-////            doctorService.grantVisibility(doctor, department.getId());
-//
-//            // Set visibility to true for the assigned patient
-////            patient.setVisibility(true);
-//            patientService.savePatient(patient);
-//        }
-//
-//        return "redirect:/assign";
-//    }
+    @PostMapping("/assign")
+    public String assignDoctorToPatient(@RequestParam("doctorId") int doctorId, @RequestParam("patientId") int patientId) {
+        // Retrieve the doctor and patient objects
+        Optional<Doctor> optionalDoctor = doctorService.getDoctorById(doctorId);
+        Optional<Patient> optionalPatient = patientService.getPatientById(patientId);
+
+        if (optionalDoctor.isPresent() && optionalPatient.isPresent()) {
+            Doctor doctor = optionalDoctor.get();
+            Patient patient = optionalPatient.get();
+
+            // Create a new assignment
+            Assignment assignment = new Assignment();
+            assignment.setDoctor(doctor);
+            assignment.setPatient(patient);
+            assignmentService.saveAssignment(assignment);
+
+        } else {
+            // Handle the case where either the doctor or patient is not found
+            // Display an error message or redirect to an error page
+            return "error";
+        }
+
+        // Redirect to a success page or the assign page
+        return "redirect:/assign";
+    }
 }

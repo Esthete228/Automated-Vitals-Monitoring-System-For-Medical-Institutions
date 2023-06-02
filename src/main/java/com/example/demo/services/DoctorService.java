@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.entities.Department;
 import com.example.demo.entities.Doctor;
 import com.example.demo.repositories.DoctorRepository;
+import com.example.demo.repositories.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class DoctorService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public DoctorService(DoctorRepository doctorRepository, DepartmentService departmentService, PatientService patientService, PasswordEncoder passwordEncoder) {
+    public DoctorService(DoctorRepository doctorRepository, DepartmentService departmentService, PasswordEncoder passwordEncoder, PatientRepository patientRepository) {
         this.doctorRepository = doctorRepository;
         this.departmentService = departmentService;
         this.passwordEncoder = passwordEncoder;

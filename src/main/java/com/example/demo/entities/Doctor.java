@@ -59,5 +59,4 @@ public class Doctor {
     public void setDepartment(Department department) {
         this.department = department;
     }
-
 }

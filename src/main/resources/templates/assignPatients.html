@@ -35,9 +35,6 @@
     var doctorId = document.getElementById("doctorId").value;
     var patientId = document.getElementById("patientId").value;
 
-
-    // Perform validation logic here
-
     if (doctorId === "") {
       alert("Please select a doctor.");
       return false;
@@ -47,10 +44,9 @@
       alert("Please select a patient.");
       return false;
     }
-    // Return true to submit the form
+
     return true;
   }
-
 
   // Fetch doctors and patients and populate the select dropdown
   fetch('/fetchDoctors')
@@ -61,15 +57,18 @@
             return response.json();
           })
           .then(data => {
-            const select = document.getElementById("doctorId"); // Get the doctor select dropdown
+            const select = document.getElementById("doctorId");
             data.forEach(doctor => {
               const option = document.createElement("option");
               option.value = doctor.id;
-              if (doctor.firstName && doctor.lastName) {
-                option.text = `${doctor.firstName} ${doctor.lastName}`;
+
+              // Check if firstName and lastName are unreachable
+              if (!doctor.firstName || !doctor.lastName) {
+                option.text = doctor.username; // Display the username instead
               } else {
-                option.text = doctor.username; // Fallback option if firstName and lastName are not available
+                option.text = `${doctor.firstName} ${doctor.lastName}`;
               }
+
               select.appendChild(option);
             });
           })
@@ -85,7 +84,7 @@
             return response.json();
           })
           .then(data => {
-            const select = document.getElementById("patientId"); // Get the patient select dropdown
+            const select = document.getElementById("patientId");
             data.forEach(patient => {
               const option = document.createElement("option");
               option.value = patient.id;
