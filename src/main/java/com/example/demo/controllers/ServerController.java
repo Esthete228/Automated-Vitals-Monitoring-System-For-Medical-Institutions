@@ -183,10 +183,16 @@ public class ServerController {
         // Get the logged-in doctor's department ID
         Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
         int doctorId = authenticatedDoctor.getID();
-
-        // Fetch patients based on the doctor's ID from the assignment table
-
-        return assignmentService.getAssignedPatientsByDoctorId(doctorId);
+        String position = authenticatedDoctor.getPosition();
+        // Check if the doctor has a senior position
+        if (position.equals("senior")) {
+            // Fetch all patients from the department
+            int departmentId = authenticatedDoctor.getDepartment().getId();
+            return patientService.getPatientsByDepartmentId(departmentId);
+        } else {
+            // Fetch patients based on the doctor's ID from the assignment table
+            return assignmentService.getAssignedPatientsByDoctorId(doctorId);
+        }
     }
 
 

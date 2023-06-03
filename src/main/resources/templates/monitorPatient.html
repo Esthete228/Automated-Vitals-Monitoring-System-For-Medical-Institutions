@@ -177,7 +177,6 @@
           .catch(error => {
             console.error('Error fetching patients:', error);
           });
-
   // Event listener for "Start Monitoring" button
   startMonitoringBtn.addEventListener("click", () => {
     const selectedPatientIds = Array.from(select.selectedOptions).map(option => option.value);
