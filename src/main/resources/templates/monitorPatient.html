@@ -138,7 +138,7 @@
     }
 
     // Check temperature
-    if (vitals.temperature > 41.2 || vitals.temperature < 30.0) {
+    if (vitals.temperature > 41.2 || vitals.temperature < 35.0) {
       alert(`Patient ${patientId}: Temperature is out of the normal range!`);
       displayStatus(patientId, 'temperature', 'Vital signs are not in the normal range.');
     } else {

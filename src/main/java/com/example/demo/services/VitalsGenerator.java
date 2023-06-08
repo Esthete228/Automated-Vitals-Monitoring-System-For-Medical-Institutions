@@ -5,6 +5,7 @@ import com.example.demo.entities.PatientHistory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 @Service
@@ -59,17 +60,22 @@ public class VitalsGenerator {
         int variabilityRange = 5;
 
         // Генерація значення навколо середніх значень з мінливістю
-        int heartRate = random.nextInt(variabilityRange * 2 + 1) + (middleHeartRate - variabilityRange);
-        int systolicBP = random.nextInt(variabilityRange * 2 + 1) + (middleSystolicBP - variabilityRange);
-        int diastolicBP = random.nextInt(variabilityRange * 2 + 1) + (middleDiastolicBP - variabilityRange);
-        double temperature = random.nextDouble() * (variabilityRange * 2) + (middleTemperature - variabilityRange);
-        int oxygenSaturation = random.nextInt(variabilityRange * 2 + 1) + (middleOxygenSaturation - variabilityRange);
+        int heartRate = generateValueAroundAverage(middleHeartRate, variabilityRange, random);
+        int systolicBP = generateValueAroundAverage(middleSystolicBP, variabilityRange, random);
+        int diastolicBP = generateValueAroundAverage(middleDiastolicBP, variabilityRange, random);
+        double temperature = generateValueAroundAverage(middleTemperature, variabilityRange, random);
+        int oxygenSaturation = generateValueAroundAverage(middleOxygenSaturation, variabilityRange, random);
+
+
+        DecimalFormat decimalFormat = new DecimalFormat("#.#");
+        String formattedTemperature = decimalFormat.format(temperature);
+        formattedTemperature = formattedTemperature.replace(",", ".");
 
         // Оновлення значення стану здоров'я
         healthState.setHeart_rate(heartRate);
         healthState.setSystolicBP(systolicBP);
         healthState.setDiastolicBP(diastolicBP);
-        healthState.setTemperature(temperature);
+        healthState.setTemperature(Double.parseDouble(formattedTemperature));
         healthState.setOxygen_saturation(oxygenSaturation);
 
         // Збереження оновленого стану здоров'я в базі даних
@@ -82,11 +88,23 @@ public class VitalsGenerator {
         patientHistoryEntry.setHeart_rate(heartRate);
         patientHistoryEntry.setSystolicBP(systolicBP);
         patientHistoryEntry.setDiastolicBP(diastolicBP);
-        patientHistoryEntry.setTemperature(temperature);
+        patientHistoryEntry.setTemperature(Double.parseDouble(formattedTemperature));
         patientHistoryEntry.setOxygen_Saturation(oxygenSaturation);
         patientHistoryEntry.setTimestamp(new Date());
 
         // Збереження історії хвороби пацієнта в базі даних
         patientHistoryService.savePatientHistory(patientHistoryEntry);
+    }
+
+    private int generateValueAroundAverage(int average, int variabilityRange, Random random) {
+        int minValue = average - variabilityRange;
+        int maxValue = average + variabilityRange;
+        return random.nextInt(maxValue - minValue + 1) + minValue;
+    }
+
+    private double generateValueAroundAverage(double average, int variabilityRange, Random random) {
+        double minValue = average - variabilityRange;
+        double maxValue = average + variabilityRange;
+        return minValue + (maxValue - minValue) * random.nextDouble();
     }
 }
