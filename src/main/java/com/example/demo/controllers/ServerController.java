@@ -17,7 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -285,7 +284,7 @@ public class ServerController {
     }
 
     @PostMapping("/departments")
-    public String createDepartment(@Valid @ModelAttribute("department") Department department, BindingResult bindingResult) {
+    public String createDepartment(@RequestBody Department department, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "createDepartment";
         }

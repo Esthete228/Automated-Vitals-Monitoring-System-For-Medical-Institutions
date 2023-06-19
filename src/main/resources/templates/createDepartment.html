@@ -7,15 +7,15 @@
 <body>
 
 <div class="top-bar">
-<div class="bar-theme top-bar top-bar-large">
-  <a href="/home" class="bar-item theme-l1">
-    <button class="button theme">Go Back to Starter Page</button>
-  </a>
-</div>
+  <div class="bar-theme top-bar top-bar-large">
+    <a href="/home" class="bar-item theme-l1">
+      <button class="button theme">Go Back to Starter Page</button>
+    </a>
+  </div>
 </div>
 
 <h1>Create Department</h1>
-<form action="/departments" method="post">
+<form id="createDepartmentForm">
   <label for=name>Department Name:</label>
   <input type="text" id="name" name="name" required>
   <br><br>
@@ -23,5 +23,40 @@
     <button type="submit">Create</button>
   </div>
 </form>
+
+<script>
+  document.getElementById("createDepartmentForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent form submission
+
+    const name = document.getElementById("name").value;
+
+    const departmentData = {
+      name: name
+    };
+
+    // Send a POST request to create the department
+    fetch('/departments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(departmentData)
+    })
+            .then(response => {
+              // Handle the response
+              if (response.ok) {
+                alert('Department created successfully');
+                // Redirect to a success page or perform any other action
+              } else {
+                alert('Failed to create department');
+              }
+            })
+            .catch(error => {
+              // Handle the error
+              console.error('Error:', error);
+            });
+  });
+</script>
+
 </body>
 </html>

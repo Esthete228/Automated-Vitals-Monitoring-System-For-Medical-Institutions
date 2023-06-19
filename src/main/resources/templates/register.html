@@ -72,10 +72,10 @@
             .then(response => {
               // Handle the response
               if (response.ok) {
-                console.log('Doctor registered successfully');
+                alert('Doctor registered successfully');
                 // Redirect to a success page or perform any other action
               } else {
-                console.error('Failed to register doctor');
+                alert('Failed to register doctor');
               }
             })
             .catch(error => {
@@ -83,7 +83,6 @@
               console.error('Error:', error);
             });
   }
-
   // Function to populate the department options
   function populateDepartmentOptions() {
     const departmentSelect = document.getElementById("departmentId");
