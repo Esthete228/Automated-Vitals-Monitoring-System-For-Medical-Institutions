@@ -17,31 +17,40 @@
 
     <div id="adminButtons" style="display: none;">
       <a href="/register" class="bar-item theme-l2">
-        <button id="createDoctorButton" class="button theme">Create New Doctor</button>
+        <button id="createDoctorButton" class="button theme">Create new user</button>
       </a>
       <a href="/departments" class="bar-item theme-l3">
-        <button id="createDepartmentButton" class="button theme">Create New Department</button>
+        <button id="createDepartmentButton" class="button theme">Create new department</button>
       </a>
     </div>
 
     <div id="seniorDoctorButtons" style="display: none;">
-      <a href="/patients" class="bar-item theme-l2">
-        <button id="createPatientButton" class="button theme">Create New Patient</button>
-      </a>
-      <a href="/patientLog" class="bar-item theme-l3">
-        <button id="reviewPatientHistory" class="button theme">Review patients health history</button>
-      </a>
-      <a href="/patientConclusion" class="bar-item theme-l4">
-        <button id="reviewPatientConclusion" class="button theme">Review patients conclusion</button>
-      </a>
-      <a href="/assign" class="bar-item theme-l5">
+      <a href="/assign" class="bar-item theme-l1">
         <button id="assignDoctorButton" class="button theme">Assign doctors to patients</button>
+      </a>
+      <a href="/doctorAppointments" class="bar-item theme-l2">
+        <button id="appointmentCheckDoctorButton" class="button theme">Check booked appointments</button>
       </a>
     </div>
 
     <div id="doctorButtons" style="display: none;">
-      <a href="/monitorPatient" class="bar-item theme-l2">
-        <button id="monitorPatientsButton" class="button theme">Monitor Patients</button>
+      <a href="/patientConclusion" class="bar-item theme-l4">
+        <button id="reviewPatientConclusion" class="button theme">Review patients medical cards</button>
+      </a>
+    </div>
+
+    <div id="receptionistButtons" style="display: none;">
+      <a href="/patients" class="bar-item theme-l1">
+        <button id="createPatientButton" class="button theme">Register new patient</button>
+      </a>
+      <a href="/appointment" class="bar-item theme-l2">
+        <button id="appointmentButton" class="button theme">Book appointment</button>
+      </a>
+    </div>
+
+    <div id="accountantButtons" style="display: none;">
+      <a href="/account" class="bar-item theme-l1">
+        <button id="" class="button theme">Edit inventory accounting</button>
       </a>
     </div>
 
@@ -76,6 +85,14 @@
 
             if (userPosition === 'doctor') {
               document.getElementById('doctorButtons').style.display = 'block';
+            }
+
+            if (userPosition === 'receptionist') {
+              document.getElementById('receptionistButtons').style.display = 'block';
+            }
+
+            if (userPosition === 'accountant') {
+              document.getElementById('accountantButtons').style.display = 'block';
             }
           })
           .catch(error => console.error('Error:', error));

@@ -26,7 +26,7 @@ public class DoctorService {
     }
 
     public List<Doctor> getAllDoctors() {
-        return doctorRepository.findAll();
+        return doctorRepository.findAll(); // Fetch all doctors from the repository
     }
 
     public Doctor findByUsername(String username) {

@@ -17,7 +17,7 @@
 </div>
 
 <div class="container">
-  <h1>Doctor Registration</h1>
+  <h1>User Registration</h1>
   <form id="registerForm" onsubmit="registerUser(event)">
     <label for=username>Username:</label>
     <input type="text" id="username" required>
@@ -31,6 +31,8 @@
       <option value="admin">admin</option>
       <option value="senior">senior</option>
       <option value="doctor">doctor</option>
+      <option value="receptionist">receptionist</option>
+      <option value="receptionist">accountant</option>
     </select>
 
     <label for=departmentId>Department:</label>
@@ -72,10 +74,10 @@
             .then(response => {
               // Handle the response
               if (response.ok) {
-                alert('Doctor registered successfully');
+                alert('User registered successfully');
                 // Redirect to a success page or perform any other action
               } else {
-                alert('Failed to register doctor');
+                alert('Failed to register user');
               }
             })
             .catch(error => {

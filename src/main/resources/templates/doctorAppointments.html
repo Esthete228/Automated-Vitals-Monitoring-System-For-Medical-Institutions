@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor Appointments</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="bar-theme top-bar top-bar-large">
+        <a href="/home" class="bar-item theme-l1">
+            <button class="button theme">Go Back to Starter Page</button>
+        </a>
+    </div>
+</div>
+
+<h2>Doctor Appointments</h2>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <!-- Add more columns if needed -->
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Use Thymeleaf to iterate through appointments -->
+    <tr th:each="appointment : ${appointments}">
+        <td th:text="${appointment.appointment_id}"></td>
+        <td th:text="${appointment.date}"></td>
+        <!-- Add more columns if needed -->
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

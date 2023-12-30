@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,22 +34,23 @@ public class ServerController {
     private final PatientHistoryService patientHistoryService;
     private final DoctorService doctorService;
     private final DepartmentService departmentService;
-    private final PasswordEncoder passwordEncoder;
     private final AssignmentService assignmentService;
+
+    private final AppointmentService appointmentService;
 
     @Autowired
     public ServerController(PatientService patientService, HealthStateService healthStateService,
                             MedicalCardService medicalCardService, PatientHistoryService patientHistoryService,
                             DoctorService doctorService,
-                            DepartmentService departmentService, PasswordEncoder passwordEncoder, AssignmentService assignmentService) {
+                            DepartmentService departmentService, PasswordEncoder passwordEncoder, AssignmentService assignmentService, AppointmentService appointmentService) {
         this.patientService = patientService;
         this.healthStateService = healthStateService;
         this.medicalCardService = medicalCardService;
         this.patientHistoryService = patientHistoryService;
         this.doctorService = doctorService;
         this.departmentService = departmentService;
-        this.passwordEncoder = passwordEncoder;
         this.assignmentService = assignmentService;
+        this.appointmentService = appointmentService;
     }
 
     @GetMapping(value = "/home")
@@ -162,19 +166,36 @@ public class ServerController {
     @GetMapping("/fetchDoctors")
     @ResponseBody
     public List<Doctor> fetchDoctors(HttpServletRequest request) {
-        // Get the logged-in doctor's department ID
         Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
-        int departmentId = authenticatedDoctor.getDepartment().getId();
+        String position = authenticatedDoctor.getPosition();
+        System.out.println("User position: " + position);
 
-        // Fetch doctors based on the department ID and role "doctor"
-        List<Doctor> doctors = doctorService.getDoctorsByDepartmentId(departmentId);
+        List<Doctor> doctors;
 
-        // Filter the doctors based on their role
+        if ("receptionist".equalsIgnoreCase(position)) {
+            // Fetch all doctors excluding those with the administrative department
+            doctors = doctorService.getAllDoctors().stream()
+                    .filter(doctor -> !isAdministrativeDepartment(doctor.getDepartment()))
+                    .collect(Collectors.toList());
 
-        return doctors.stream()
-                .filter(doctor -> doctor.getPosition().equals("doctor"))
-                .collect(Collectors.toList());
+            System.out.println("Fetching all doctors for receptionist (excluding administrative department)");
+        } else {
+            int departmentId = authenticatedDoctor.getDepartment().getId();
+            doctors = doctorService.getDoctorsByDepartmentId(departmentId);
+            System.out.println("Fetching doctors for department: " + departmentId);
+        }
+
+        System.out.println("Fetched doctors: " + doctors);
+        return doctors;
     }
+
+    private boolean isAdministrativeDepartment(Department department) {
+        // Define the ID of the administrative department
+        int administrativeDepartmentId = 1; // Replace with the actual ID
+
+        return department != null && department.getId() == administrativeDepartmentId;
+    }
+
 
     @GetMapping("/fetchAssignedPatients")
     @ResponseBody
@@ -290,7 +311,7 @@ public class ServerController {
         }
 
         departmentService.saveDepartment(department); // Assuming the method to save/update a department is named 'saveDepartment'
-        return "redirect:/departments";
+        return "redirect:/home";
     }
 
     @GetMapping("/departments/list")
@@ -335,5 +356,50 @@ public class ServerController {
 
         // Redirect to a success page or the assign page
         return "redirect:/assign";
+    }
+
+    @GetMapping("/appointment")
+    public String appointment(Model model) {
+        List<Doctor> doctors = doctorService.getAllDoctors();
+        model.addAttribute("doctors", doctors);
+        return "appointment";
+    }
+
+    @PostMapping("/bookAppointment")
+    public ResponseEntity<String> bookAppointment(@RequestParam("doctorId") int doctorId,
+                                                  @RequestParam("appointmentDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appointmentDate) {
+        try {
+            // Retrieve the selected doctor
+            Optional<Doctor> optionalDoctor = doctorService.getDoctorById(doctorId);
+            if (optionalDoctor.isPresent()) {
+                Doctor doctor = optionalDoctor.get();
+
+                // Create an appointment
+                Appointment appointment = new Appointment();
+                appointment.setDoctor(doctor);
+                appointment.setDate(Date.valueOf(appointmentDate));
+
+                // Save the appointment
+                appointmentService.saveAppointment(appointment);
+
+                return ResponseEntity.ok("Appointment booked successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Doctor not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error booking appointment");
+        }
+    }
+
+    @GetMapping("/doctorAppointments")
+    public String doctorAppointments(Model model, HttpServletRequest request) {
+        Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
+        int doctorID = authenticatedDoctor.getID();
+
+        List<Appointment> appointments = appointmentService.getAppointmentsByDoctorId(doctorID);
+
+        model.addAttribute("appointments", appointments);
+        return "doctorAppointments";
     }
 }
