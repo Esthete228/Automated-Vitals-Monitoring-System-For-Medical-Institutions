@@ -15,12 +15,15 @@
     </div>
 </div>
 
-<form id="appointmentForm" action="/bookAppointment" method="post" onsubmit="return validateForm()">
+<form id="appointmentForm" onsubmit="return validateForm()">
     <label for=doctorId>Doctor:</label>
     <select id="doctorId" name="doctorId"></select><br><br>
 
-    <label for=appointmentDate>Appointment date:</label>
-    <input type="date" id="appointmentDate" name="appointmentDate" required><br><br>
+    <label for=patientId>Patient:</label>
+    <select id="patientId" name="patientId"></select><br><br>
+
+    <label for=appointmentDateTime>Appointment date and time:</label>
+    <input type="datetime-local" id="appointmentDateTime" name="appointmentDateTime"><br><br>
 
     <button type="submit">Book</button>
 </form>
@@ -28,10 +31,11 @@
 <script>
     function validateForm() {
         let doctorId = document.getElementById("doctorId").value;
+        let patientId = document.getElementById("patientId").value;
         let appointmentDate = document.getElementById("appointmentDate").value;
 
-        if (doctorId === "") {
-            alert("Please select a doctor.");
+        if (doctorId === "" || patientId === "") {
+            alert("Please select a doctor and patient.");
             return false;
         }
 
@@ -39,8 +43,6 @@
             alert("Please specify the appointment date.");
             return false;
         }
-
-        // Other validation logic if needed...
 
         return true;
     }
@@ -73,18 +75,39 @@
             console.error('Error fetching doctors:', error);
         });
 
-    // Handle the form submission
-    document.querySelector('form').addEventListener('submit', function(event) {
+    fetch('/fetchPatients')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error fetching patients');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const select = document.getElementById("patientId");
+            data.forEach(patient => {
+                const option = document.createElement("option");
+                option.value = patient.id;
+                option.text = `${patient.firstName} ${patient.lastName}`;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching patients:', error);
+        });
+
+    document.querySelector('form').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent the default form submission
 
         var form = event.target;
         var formData = new FormData(form);
 
-        fetch(form.action, {
-            method: form.method,
+        // Fetch request to book an appointment
+        fetch('/bookAppointment', {
+            method: 'POST',
             body: formData
         })
             .then(response => {
+                // Handle the response
                 if (response.ok) {
                     return response.text(); // Read the response body as text
                 } else {

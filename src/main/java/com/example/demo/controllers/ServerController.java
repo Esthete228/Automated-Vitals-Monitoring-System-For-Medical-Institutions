@@ -18,12 +18,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -154,13 +151,27 @@ public class ServerController {
     @GetMapping("/fetchPatients")
     @ResponseBody
     public List<Patient> fetchPatients(HttpServletRequest request) {
-        // Get the logged-in doctor's department ID
         Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
-        int departmentId = authenticatedDoctor.getDepartment().getId();
+        String position = authenticatedDoctor.getPosition();
+        System.out.println("User position: " + position);
 
-        // Fetch patients based on the department ID
+        List<Patient> patients;
 
-        return patientService.getPatientsByDepartmentId(departmentId);
+        if ("receptionist".equalsIgnoreCase(position)) {
+            // Fetch all patients excluding those with the administrative department
+            patients = patientService.getAllPatients().stream()
+                    .filter(patient -> !isAdministrativeDepartment(patient.getDepartment()))
+                    .collect(Collectors.toList());
+
+            System.out.println("Fetching all patients for receptionist (excluding administrative department)");
+        } else {
+            int departmentId = authenticatedDoctor.getDepartment().getId();
+            patients = patientService.getPatientsByDepartmentId(departmentId);
+            System.out.println("Fetching patients for department: " + departmentId);
+        }
+
+        System.out.println("Fetched patients: " + patients);
+        return patients;
     }
 
     @GetMapping("/fetchDoctors")
@@ -366,25 +377,32 @@ public class ServerController {
     }
 
     @PostMapping("/bookAppointment")
-    public ResponseEntity<String> bookAppointment(@RequestParam("doctorId") int doctorId,
-                                                  @RequestParam("appointmentDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate appointmentDate) {
+    public ResponseEntity<String> bookAppointment(
+            @RequestParam int doctorId,
+            @RequestParam int patientId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime appointmentDateTime) {
+
         try {
             // Retrieve the selected doctor
             Optional<Doctor> optionalDoctor = doctorService.getDoctorById(doctorId);
-            if (optionalDoctor.isPresent()) {
+            Optional<Patient> optionalPatient = patientService.getPatientById(patientId);
+
+            if (optionalDoctor.isPresent() && optionalPatient.isPresent()) {
                 Doctor doctor = optionalDoctor.get();
+                Patient patient = optionalPatient.get();
 
                 // Create an appointment
                 Appointment appointment = new Appointment();
                 appointment.setDoctor(doctor);
-                appointment.setDate(Date.valueOf(appointmentDate));
+                appointment.setPatient(patient);
+                appointment.setDateTime(appointmentDateTime);
 
                 // Save the appointment
                 appointmentService.saveAppointment(appointment);
 
                 return ResponseEntity.ok("Appointment booked successfully");
             } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Doctor not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Doctor or Patient not found");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -393,13 +411,16 @@ public class ServerController {
     }
 
     @GetMapping("/doctorAppointments")
-    public String doctorAppointments(Model model, HttpServletRequest request) {
+    public String getDoctorAppointments(Model model, HttpServletRequest request) {
         Doctor authenticatedDoctor = getAuthenticatedDoctor(request);
-        int doctorID = authenticatedDoctor.getID();
 
-        List<Appointment> appointments = appointmentService.getAppointmentsByDoctorId(doctorID);
-
-        model.addAttribute("appointments", appointments);
-        return "doctorAppointments";
+        if (authenticatedDoctor != null) {
+            int doctorId = authenticatedDoctor.getID();
+            List<Appointment> doctorAppointments = appointmentService.getDoctorAppointments(doctorId);
+            model.addAttribute("appointments", doctorAppointments);
+            return "doctorAppointments"; // Assuming you have a Thymeleaf template named "doctorAppointments.html"
+        } else {
+            return "redirect:/login";
+        }
     }
 }

@@ -17,22 +17,22 @@
 
 <h2>Doctor Appointments</h2>
 
-<table border="1">
+<table>
     <thead>
     <tr>
-        <th>ID</th>
-        <th>Date</th>
-        <!-- Add more columns if needed -->
+        <th>Date and Time</th>
+        <th>Patient Name</th>
+        <th>Patient Surname</th>
     </tr>
     </thead>
     <tbody>
-    <!-- Use Thymeleaf to iterate through appointments -->
     <tr th:each="appointment : ${appointments}">
-        <td th:text="${appointment.appointment_id}"></td>
-        <td th:text="${appointment.date}"></td>
-        <!-- Add more columns if needed -->
+        <td th:text="${appointment.dateTime}"></td>
+        <td th:text="${appointment.patient.firstName}"></td>
+        <td th:text="${appointment.patient.lastName}"></td>
     </tr>
     </tbody>
 </table>
+
 </body>
 </html>
