@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Inventory</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="bar-theme top-bar top-bar-large">
+        <a href="/accountantInventory" class="bar-item theme-l1">
+            <button class="button theme">Go Back to Accountant Inventory</button>
+        </a>
+    </div>
+</div>
+
+<h2>Edit Inventory</h2>
+
+<form action="/saveInventory" method="post" th:object="${inventory}">
+    <!-- Input fields for editing the inventory -->
+    <input type="hidden" th:field="*{id}">
+    <label>Name: <input type="text" th:field="*{name}"></label>
+    <label>Amount: <input type="text" th:field="*{amount}"></label>
+    <input type="submit" value="Save">
+</form>
+
+</body>
+</html>

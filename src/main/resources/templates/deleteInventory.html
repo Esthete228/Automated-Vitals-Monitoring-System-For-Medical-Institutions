@@ -1,0 +1,25 @@
+<!-- deleteInventory.html -->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Inventory</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<h2>Delete Inventory</h2>
+
+<!-- Form for deleting inventory item -->
+<form action="/deleteInventory" method="get">
+    <!-- Input field for the inventory item ID -->
+    <label>Inventory ID: <input type="text" name="id"></label>
+    <input type="submit" value="Delete Inventory">
+</form>
+
+<!-- Link to go back to accountantInventory page -->
+<a th:href="@{/accountantInventory}">Back to Accountant Inventory</a>
+
+</body>
+</html>

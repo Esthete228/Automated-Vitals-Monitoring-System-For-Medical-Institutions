@@ -1,0 +1,34 @@
+<!-- addInventory.html -->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Inventory</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="bar-theme top-bar top-bar-large">
+        <a href="/home" class="bar-item theme-l1">
+            <button class="button theme">Go Back to Starter Page</button>
+        </a>
+        <a href="/accountantInventory" class="bar-item theme-l1">
+            <button class="button theme">Back to Accountant Inventory</button>
+        </a>
+    </div>
+</div>
+<h2>Add Inventory</h2>
+
+<!-- Form for adding new inventory item -->
+<form action="/saveInventory" method="post">
+    <!-- Input fields for the new inventory item -->
+    <label>Name: <input type="text" name="name"></label>
+    <label>Amount: <input type="text" name="amount"></label>
+    <input type="submit" value="Add New Inventory">
+</form>
+
+
+</body>
+</html>

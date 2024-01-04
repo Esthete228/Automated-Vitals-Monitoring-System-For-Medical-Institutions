@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Accountant Inventory</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="bar-theme top-bar top-bar-large">
+        <a href="/home" class="bar-item theme-l1">
+            <button class="button theme">Go Back to Starter Page</button>
+        </a>
+        <a href="/addInventory" class="bar-item theme-l1">
+            <button class="button theme">Add New Inventory</button>
+        </a>
+
+    </div>
+</div>
+
+<h2>Accountant Inventory</h2>
+
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Amount</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="inventory : ${inventories}">
+        <td th:text="${inventory.id}"></td>
+        <td th:text="${inventory.name}"></td>
+        <td th:text="${inventory.amount}"></td>
+        <td>
+            <a th:href="@{/editInventory/{id}(id=${inventory.id})}">Edit</a>
+            <a th:href="@{/deleteInventory/{id}(id=${inventory.id})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
