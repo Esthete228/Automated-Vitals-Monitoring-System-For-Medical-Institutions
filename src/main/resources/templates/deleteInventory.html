@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Inventory</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Add some styles for the form */
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Style the Delete button */
+        .delete-button {
+            background-color: #dc3545; /* Red color, you can customize */
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Style the Go Back link */
+        .go-back-link {
+            display: inline-block;
+            padding: 10px 15px;
+            text-decoration: none;
+            background-color: #007bff; /* Blue color, you can customize */
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Delete Inventory</h2>
+
+<!-- Form for deleting inventory item -->
+<form action="/deleteInventory" method="get">
+    <!-- Input field for the inventory item ID -->
+    <label>Inventory ID: <input type="text" name="id"></label>
+    <input type="submit" value="Delete Inventory" class="delete-button">
+</form>
+
+<!-- Link to go back to accountantInventory page -->
+<a th:href="@{/accountantInventory}" class="go-back-link">Back to Accountant Inventory</a>
+
+</body>
+</html>

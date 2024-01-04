@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Inventory</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Add some styles for the form */
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Style the Save button */
+        .save-button {
+            background-color: #28a745; /* Green color, you can customize */
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Style the Go Back button */
+        .go-back-button {
+            background-color: #007bff; /* Blue color, you can customize */
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="bar-theme top-bar top-bar-large">
+        <a href="/accountantInventory" class="bar-item theme-l1">
+            <button class="button theme go-back-button">Go Back to Accountant Inventory</button>
+        </a>
+    </div>
+</div>
+
+<h2>Edit Inventory</h2>
+
+<form action="/saveInventory" method="post" th:object="${inventory}">
+    <!-- Input fields for editing the inventory -->
+    <input type="hidden" th:field="*{id}">
+    <label>Name: <input type="text" th:field="*{name}"></label>
+    <label>Amount: <input type="text" th:field="*{amount}"></label>
+    <input type="submit" value="Save" class="save-button">
+</form>
+
+</body>
+</html>

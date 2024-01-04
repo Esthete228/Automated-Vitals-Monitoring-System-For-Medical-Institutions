@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Inventory</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Add some styles for the form */
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Style the Add New Inventory button */
+        .add-button {
+            background-color: #28a745; /* Green color, you can customize */
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="top-bar">
+    <div class="bar-theme top-bar top-bar-large">
+        <a href="/home" class="bar-item theme-l1">
+            <button class="button theme go-back-button">Go Back to Starter Page</button>
+        </a>
+        <a href="/accountantInventory" class="bar-item theme-l1">
+            <button class="button theme go-back-button">Back to Accountant Inventory</button>
+        </a>
+    </div>
+</div>
+
+<h2>Add Inventory</h2>
+
+<!-- Form for adding new inventory item -->
+<form action="/saveInventory" method="post">
+    <!-- Input fields for the new inventory item -->
+    <label>Name: <input type="text" name="name" required></label>
+    <label>Amount: <input type="text" name="amount" required></label>
+    <input type="submit" value="Add New Inventory" class="add-button">
+</form>
+
+</body>
+</html>

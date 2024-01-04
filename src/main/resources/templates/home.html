@@ -5,6 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="/style.css">
+
+  <style>
+    .welcome-message {
+      font-size: 18px;
+      color: #333; /* Choose your desired text color */
+    }
+
+    .username {
+      font-weight: bold;
+      color: #007bff; /* Choose your desired username color */
+    }
+  </style>
 </head>
 <body>
 
@@ -49,7 +61,7 @@
     </div>
 
     <div id="accountantButtons" style="display: none;">
-      <a href="/account" class="bar-item theme-l1">
+      <a href="/accountantInventory" class="bar-item theme-l1">
         <button id="" class="button theme">Edit inventory accounting</button>
       </a>
     </div>
@@ -61,8 +73,8 @@
 
 <div class="content">
   <div class="container">
-    <h1>Vital Signs Monitoring System</h1>
-    <p>Welcome to the Vital Signs Monitoring System!</p>
+    <h1>Hospital System</h1>
+    <p class="welcome-message">Welcome to the Hospital System, <span th:text="${username}" class="username"></span>!</p>
   </div>
 </div>
 

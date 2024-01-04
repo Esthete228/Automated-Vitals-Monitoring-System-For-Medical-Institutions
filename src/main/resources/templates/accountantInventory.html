@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Doctor Appointments</title>
+    <title>Accountant Inventory</title>
     <link rel="stylesheet" href="/style.css">
     <style>
         /* Add some styles for the table */
@@ -32,6 +32,10 @@
             border-radius: 4px;
         }
 
+        .edit-button {
+            background-color: #007bff; /* Blue color, you can customize */
+        }
+
         .delete-button {
             background-color: #dc3545; /* Red color, you can customize */
         }
@@ -44,30 +48,31 @@
         <a href="/home" class="bar-item theme-l1">
             <button class="button theme">Go Back to Starter Page</button>
         </a>
-        <a href="/patientConclusion" class="bar-item theme-l2">
-            <button class="button theme">Open medical cards</button>
+        <a href="/addInventory" class="bar-item theme-l1">
+            <button class="button theme">Add New Inventory</button>
         </a>
     </div>
 </div>
 
-<h2>Doctor Appointments</h2>
+<h2>Accountant Inventory</h2>
 
 <table>
     <thead>
     <tr>
-        <th>Date and Time</th>
-        <th>Patient Name</th>
-        <th>Patient Surname</th>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Amount</th>
         <th>Actions</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="appointment : ${appointments}">
-        <td th:text="${appointment.dateTime}"></td>
-        <td th:text="${appointment.patient.firstName}"></td>
-        <td th:text="${appointment.patient.lastName}"></td>
+    <tr th:each="inventory : ${inventories}">
+        <td th:text="${inventory.id}"></td>
+        <td th:text="${inventory.name}"></td>
+        <td th:text="${inventory.amount}"></td>
         <td class="action-buttons">
-            <a th:href="@{/deleteAppointment/{id}(id=${appointment.appointment_id})}" class="delete-button">Delete</a>
+            <a th:href="@{/editInventory/{id}(id=${inventory.id})}" class="edit-button">Edit</a>
+            <a th:href="@{/deleteInventory/{id}(id=${inventory.id})}" class="delete-button">Delete</a>
         </td>
     </tr>
     </tbody>

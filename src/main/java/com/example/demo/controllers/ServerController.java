@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -18,9 +19,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,11 +38,13 @@ public class ServerController {
 
     private final AppointmentService appointmentService;
 
+    private final InventoryService inventoryService;
+
     @Autowired
     public ServerController(PatientService patientService, HealthStateService healthStateService,
                             MedicalCardService medicalCardService, PatientHistoryService patientHistoryService,
                             DoctorService doctorService,
-                            DepartmentService departmentService, PasswordEncoder passwordEncoder, AssignmentService assignmentService, AppointmentService appointmentService) {
+                            DepartmentService departmentService, PasswordEncoder passwordEncoder, AssignmentService assignmentService, AppointmentService appointmentService, InventoryService inventoryService) {
         this.patientService = patientService;
         this.healthStateService = healthStateService;
         this.medicalCardService = medicalCardService;
@@ -48,10 +53,16 @@ public class ServerController {
         this.departmentService = departmentService;
         this.assignmentService = assignmentService;
         this.appointmentService = appointmentService;
+        this.inventoryService = inventoryService;
     }
 
     @GetMapping(value = "/home")
-    public String home() {
+    public String home(Authentication authentication, Model model) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName(); // Get the username
+            model.addAttribute("username", username);
+        }
+
         return "home";
     }
 
@@ -422,5 +433,51 @@ public class ServerController {
         } else {
             return "redirect:/login";
         }
+    }
+
+    @GetMapping("/deleteAppointment/{id}")
+    public String deleteAppointment(@PathVariable Integer id) {
+        appointmentService.deleteAppointment(id);
+        return "redirect:/doctorAppointments";
+    }
+
+    @GetMapping("/accountantInventory")
+    public String accountantInventoryPage(Model model) {
+        List<Inventory> inventories = inventoryService.getAllInventories();
+        model.addAttribute("inventories", inventories);
+        model.addAttribute("inventory", new Inventory()); // Add an empty inventory for the form
+
+        return "accountantInventory";
+    }
+
+    @GetMapping("/addInventory")
+    public String addInventoryPage(Model model) {
+        model.addAttribute("inventory", new Inventory()); // Add an empty inventory for the form
+        return "addInventory";
+    }
+
+    @PostMapping("/saveInventory")
+    public String saveInventory(@ModelAttribute Inventory inventory) {
+        inventoryService.saveInventory(inventory);
+        return "redirect:/accountantInventory";
+    }
+
+    @GetMapping("/editInventory/{id}")
+    public String editInventoryPage(@PathVariable Integer id, Model model) {
+        Optional<Inventory> inventory = inventoryService.getInventoryById(id);
+
+        if (inventory.isPresent()) {
+            model.addAttribute("inventory", inventory.get());
+            return "editInventory";
+        } else {
+            // Handle case where inventory is not found (redirect or show an error page)
+            return "redirect:/accountantInventory";
+        }
+    }
+
+    @GetMapping("/deleteInventory/{id}")
+    public String deleteInventory(@PathVariable Integer id) {
+        inventoryService.deleteInventory(id);
+        return "redirect:/accountantInventory";
     }
 }

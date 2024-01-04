@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Appointment</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* Add some styles for the form */
+        form {
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input {
+            padding: 8px;
+            margin-bottom: 15px;
+        }
+
+        /* Style the Delete button */
+        .delete-button {
+            background-color: #dc3545; /* Red color, you can customize */
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Style the Go Back link */
+        .go-back-link {
+            display: inline-block;
+            padding: 10px 15px;
+            text-decoration: none;
+            background-color: #007bff; /* Blue color, you can customize */
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Delete Appointment</h2>
+
+<!-- Form for deleting appointment item -->
+<form action="/deleteAppointment" method="post">
+    <!-- Input field for the appointment item ID -->
+    <label>Appointment ID: <input type="text" name="appointmentId"></label>
+    <button type="submit" class="delete-button">Delete Appointment</button>
+</form>
+
+<!-- Link to go back to doctorAppointments page -->
+<a th:href="@{/doctorAppointments}" class="go-back-link">Back to Doctor Appointments</a>
+
+</body>
+</html>
