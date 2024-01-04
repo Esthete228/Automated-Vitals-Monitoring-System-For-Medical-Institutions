@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Accountant Inventory</title>
     <link rel="stylesheet" href="/style.css">
-<<<<<<< HEAD
     <style>
         /* Add some styles for the table */
         table {
@@ -41,8 +40,6 @@
             background-color: #dc3545; /* Red color, you can customize */
         }
     </style>
-=======
->>>>>>> origin/master
 </head>
 <body>
 
@@ -54,20 +51,13 @@
         <a href="/addInventory" class="bar-item theme-l1">
             <button class="button theme">Add New Inventory</button>
         </a>
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
     </div>
 </div>
 
 <h2>Accountant Inventory</h2>
 
-<<<<<<< HEAD
-=======
 </form>
 
->>>>>>> origin/master
 <table>
     <thead>
     <tr>
@@ -82,16 +72,9 @@
         <td th:text="${inventory.id}"></td>
         <td th:text="${inventory.name}"></td>
         <td th:text="${inventory.amount}"></td>
-<<<<<<< HEAD
         <td class="action-buttons">
             <a th:href="@{/editInventory/{id}(id=${inventory.id})}" class="edit-button">Edit</a>
             <a th:href="@{/deleteInventory/{id}(id=${inventory.id})}" class="delete-button">Delete</a>
-=======
-        <td>
-            <a th:href="@{/editInventory/{id}(id=${inventory.id})}">Edit</a>
-            <a th:href="@{/deleteInventory/{id}(id=${inventory.id})}">Delete</a>
->>>>>>> origin/master
-        </td>
     </tr>
     </tbody>
 </table>
