@@ -1,4 +1,4 @@
-//package com.example.demo;
+//package com.example.demo;123213
 //
 //public interface MedicalEquipmentAPI {
 //    // Метод отримання ідентифікатора обладнання
